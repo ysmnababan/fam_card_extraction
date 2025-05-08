@@ -48,6 +48,7 @@ class FamilyData:
     
     def preprocess_kepala_keluarga(self):
         self.keluarga = preprocess_string(self.keluarga, "/-,1234567890")
+        self.kep_keluarga = self.keluarga
     
     def preprocess_alamat(self):
         self.alamat = preprocess_string(self.alamat, "/-,1234567890")
