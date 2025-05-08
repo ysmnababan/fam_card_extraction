@@ -4,18 +4,40 @@ import ScreenUtils as su
 import ImageClickZoom as icz
 import TableLinesRemover as tlr
 import KKStructure as kk
+import ParserHeader as ph
+import ParserFooter as pf
 
+JSON_TEMPLATE = "./templ/template.json"
 OUTPUT_PATH = './output'
 SLICED_UPPER_TABLE = '/sliced_upper_table'
 SLICED_LOWER_TABLE = '/sliced_lower_table'
 UNPROCESSED_KK_JSON = 'kk_data.json'
+HEADER_SOURCE_IMG = "/horizontal_part_1.png"
+FOOTER_SOURCE_IMG = "/horizontal_part_4.png"
+
 class ImageProcessor:
     def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir):
         self.target_path = target_path
         self.template_path = template_path
         self.output_aligned_path = output_aligned_path
         self.crop_output_dir = crop_output_dir
+        self.version = "after_2018"
 
+    def extract_header(self):
+        json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
+        image_path = OUTPUT_PATH + HEADER_SOURCE_IMG
+        ph.execute(image_path, json_output_path)
+
+    def extract_footer(self):
+        json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
+        image_path = OUTPUT_PATH + FOOTER_SOURCE_IMG
+        pf.execute(image_path=image_path, output_path=json_output_path)
+
+    def extract_table(self):
+        json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
+        main_table = kk.KKStructure(self.version)
+        main_table.execute(filename=json_output_path, template_filename=JSON_TEMPLATE)
+    
     def run(self):
         target = cv2.imread(self.target_path)
         template = cv2.imread(self.template_path)
@@ -96,10 +118,7 @@ class ImageProcessor:
             self.version = "after_2018"
         else :
             self.version = "before_2018"
-        print(self.version)
-
-        main_table = kk.KKStructure(self.version)
-        main_table.execute(output_dir+ "/" + UNPROCESSED_KK_JSON)
+        print(self.version)        
 
         
         
