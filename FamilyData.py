@@ -161,3 +161,4 @@ class FamilyData:
         self.preprocess_nip()
         self.preprocess_officer_name()
         self.save_to_json(output_path)
+        self.print_all()

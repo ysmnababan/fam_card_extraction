@@ -9,6 +9,7 @@ import ParserFooter as pf
 from tkinter import Tk, filedialog
 from pdf2image import convert_from_path
 import os
+import shutil
 
 JSON_TEMPLATE = "./templ/template.json"
 OUTPUT_PATH = './output'
@@ -27,6 +28,13 @@ class ImageProcessor:
         self.version = "after_2018"
         self.open_window = open_window
         self.converted_image_path = None  # path to converted PNG if PDF
+        if os.path.exists(OUTPUT_PATH):
+            shutil.rmtree(OUTPUT_PATH)
+            print(f"Deleted folder: {OUTPUT_PATH}")
+        else:
+            print(f"Folder does not exist: {OUTPUT_PATH}")
+        # Recreate it
+        os.makedirs(OUTPUT_PATH)
 
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
@@ -162,6 +170,7 @@ class ImageProcessor:
                 lines_remover.execute(output_dir)
                 self.lower_column_num = lines_remover.get_column()
             cv2.imwrite(f"./output/horizontal_part_{i}.png", cropped)
+        
         if (self.upper_column_num == 11 or self.lower_column_num == 10):
             self.version = "after_2018"
         else :
