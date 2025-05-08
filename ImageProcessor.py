@@ -7,6 +7,8 @@ import KKStructure as kk
 import ParserHeader as ph
 import ParserFooter as pf
 from tkinter import Tk, filedialog
+from pdf2image import convert_from_path
+import os
 
 JSON_TEMPLATE = "./templ/template.json"
 OUTPUT_PATH = './output'
@@ -24,6 +26,7 @@ class ImageProcessor:
         self.crop_output_dir = crop_output_dir
         self.version = "after_2018"
         self.open_window = open_window
+        self.converted_image_path = None  # path to converted PNG if PDF
 
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
@@ -42,22 +45,53 @@ class ImageProcessor:
 
     def select_file(self):
         root = Tk()
-        root.withdraw()  # hide the main tkinter window
-        self.target_path = filedialog.askopenfilename(title="Select an image file",
-                                                      filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp")])
+        root.withdraw()  # Hide tkinter window
+        self.target_path = filedialog.askopenfilename(
+            title="Select an image or PDF file",
+            filetypes=[("Image and PDF files", "*.jpg *.jpeg *.png *.bmp *.pdf")]
+        )
         if not self.target_path:
             print("No file selected.")
         else:
             print(f"Selected file: {self.target_path}")
 
+    def convert_pdf_to_png(self, pdf_path):
+        print("Converting PDF to PNG...")
+        pages = convert_from_path(pdf_path, dpi=200)
+        if not pages:
+            print("PDF has no pages.")
+            return None
+        output_png = os.path.splitext(pdf_path)[0] + "_page1.png"
+        pages[0].save(output_png, "PNG")
+        print(f"Saved first page as: {output_png}")
+        return output_png
+    
     def run(self):
         template = cv2.imread(self.template_path)
 
         if self.open_window == "true":
             self.select_file()
-        target = cv2.imread(self.target_path)
-        if target is None or template is None:
-            raise FileNotFoundError("Check your image paths.")
+
+        if self.target_path:
+            file_ext = os.path.splitext(self.target_path)[1].lower()
+
+            if file_ext == '.pdf':
+                # convert PDF to PNG first
+                self.converted_image_path = self.convert_pdf_to_png(self.target_path)
+                img_path = self.converted_image_path
+            else:
+                img_path = self.target_path
+
+            if img_path:
+                target = cv2.imread(img_path)
+                if target is None:
+                    print("Failed to load the image.")
+                else:
+                    print("Image loaded successfully.")
+            else:
+                print("No image to load.")
+        else:
+            print("Run cancelled: no file selected.")
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
         h_img, w_img = target.shape[:2]

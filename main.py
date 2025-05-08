@@ -11,7 +11,7 @@ JSON_OUTPUT_PATH = "./output/kk_data.json"
 PROCESSED_JSON_PATH = "./output/processed_data.json"
 WORKBOOK_PATH = "./templ/template.xlsx"
 FINAL_PATH = "final.xlsx"
-OPEN_EXPLORER = "false"
+OPEN_EXPLORER = "true"
 if __name__ == '__main__':
     processor = ip.ImageProcessor(
         TARGET_IMAGE_PATH,
