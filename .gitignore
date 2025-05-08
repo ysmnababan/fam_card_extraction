@@ -74,3 +74,4 @@ cython_debug/
 output/
 /img
 *:Zone.Identifier
+*final.xlsx

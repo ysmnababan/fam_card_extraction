@@ -1,5 +1,7 @@
 import ImageProcessor as ip
 import FamilyData as fd
+import ExcelTemplateFiller as etf
+
 # === Config ===
 TARGET_IMAGE_PATH = './img/kk1.jpeg'
 TEMPLATE_IMAGE_PATH = './templ/kk_template.png'
@@ -7,6 +9,9 @@ OUTPUT_ALIGNED_PATH = './output/aligned_target.png'
 CROP_OUTPUT_DIR = 'cropped_cells'
 JSON_OUTPUT_PATH = "./output/kk_data.json"
 PROCESSED_JSON_PATH = "./output/processed_data.json"
+WORKBOOK_PATH = "./templ/template.xlsx"
+FINAL_PATH = "final.xlsx"
+
 if __name__ == '__main__':
     processor = ip.ImageProcessor(
         TARGET_IMAGE_PATH,
@@ -22,3 +27,5 @@ if __name__ == '__main__':
     family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
     family.preprocess(PROCESSED_JSON_PATH)
     family.print_all()
+
+    etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
