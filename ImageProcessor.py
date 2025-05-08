@@ -6,6 +6,7 @@ import TableLinesRemover as tlr
 import KKStructure as kk
 import ParserHeader as ph
 import ParserFooter as pf
+from tkinter import Tk, filedialog
 
 JSON_TEMPLATE = "./templ/template.json"
 OUTPUT_PATH = './output'
@@ -16,12 +17,13 @@ HEADER_SOURCE_IMG = "/horizontal_part_1.png"
 FOOTER_SOURCE_IMG = "/horizontal_part_4.png"
 
 class ImageProcessor:
-    def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir):
+    def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir, open_window):
         self.target_path = target_path
         self.template_path = template_path
         self.output_aligned_path = output_aligned_path
         self.crop_output_dir = crop_output_dir
         self.version = "after_2018"
+        self.open_window = open_window
 
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
@@ -37,11 +39,23 @@ class ImageProcessor:
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
         main_table = kk.KKStructure(self.version)
         main_table.execute(filename=json_output_path, template_filename=JSON_TEMPLATE)
-    
+
+    def select_file(self):
+        root = Tk()
+        root.withdraw()  # hide the main tkinter window
+        self.target_path = filedialog.askopenfilename(title="Select an image file",
+                                                      filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp")])
+        if not self.target_path:
+            print("No file selected.")
+        else:
+            print(f"Selected file: {self.target_path}")
+
     def run(self):
-        target = cv2.imread(self.target_path)
         template = cv2.imread(self.template_path)
 
+        if self.open_window == "true":
+            self.select_file()
+        target = cv2.imread(self.target_path)
         if target is None or template is None:
             raise FileNotFoundError("Check your image paths.")
 

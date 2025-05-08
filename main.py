@@ -11,15 +11,16 @@ JSON_OUTPUT_PATH = "./output/kk_data.json"
 PROCESSED_JSON_PATH = "./output/processed_data.json"
 WORKBOOK_PATH = "./templ/template.xlsx"
 FINAL_PATH = "final.xlsx"
-
+OPEN_EXPLORER = "false"
 if __name__ == '__main__':
     processor = ip.ImageProcessor(
         TARGET_IMAGE_PATH,
         TEMPLATE_IMAGE_PATH,
         OUTPUT_ALIGNED_PATH,
-        CROP_OUTPUT_DIR
+        CROP_OUTPUT_DIR,
+        OPEN_EXPLORER
     )
-    # processor.run()
+    processor.run()
     # processor.extract_table()
     # processor.extract_header()
     # processor.extract_footer()
