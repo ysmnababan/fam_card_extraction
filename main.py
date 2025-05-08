@@ -13,4 +13,7 @@ if __name__ == '__main__':
         OUTPUT_ALIGNED_PATH,
         CROP_OUTPUT_DIR
     )
-    processor.run()
+    # processor.run()
+    processor.extract_table()
+    processor.extract_header()
+    processor.extract_footer()
