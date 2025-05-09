@@ -10,6 +10,7 @@ from tkinter import Tk, filedialog
 from pdf2image import convert_from_path
 import os
 import shutil
+import sys
 
 JSON_TEMPLATE = "./templ/template.json"
 OUTPUT_PATH = './output'
@@ -60,12 +61,18 @@ class ImageProcessor:
         )
         if not self.target_path:
             print("No file selected.")
+            sys.exit(0)
         else:
             print(f"Selected file: {self.target_path}")
 
     def convert_pdf_to_png(self, pdf_path):
+        # Get the path of the current script
+        current_dir = os.path.dirname(__file__)
+
+        # Point to the 'bin' directory inside the 'poppler' folder
+        poppler_path = os.path.join(current_dir, "poppler", "bin")
         print("Converting PDF to PNG...")
-        pages = convert_from_path(pdf_path, dpi=200)
+        pages = convert_from_path(pdf_path, dpi=200, poppler_path=poppler_path)
         if not pages:
             print("PDF has no pages.")
             return None
@@ -94,12 +101,14 @@ class ImageProcessor:
                 target = cv2.imread(img_path)
                 if target is None:
                     print("Failed to load the image.")
+                    sys.exit(0)
                 else:
                     print("Image loaded successfully.")
             else:
                 print("No image to load.")
         else:
             print("Run cancelled: no file selected.")
+            sys.exit(0)
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
         h_img, w_img = target.shape[:2]
