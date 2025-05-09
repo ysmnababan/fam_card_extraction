@@ -33,7 +33,7 @@ if __name__ == '__main__':
     )
     # processor.run()
     # processor.extract_table()
-    processor.extract_header()
+    # processor.extract_header()
     processor.extract_footer()
 
     # family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)

@@ -5,7 +5,7 @@ import json
 import os
 
 first_keywords = ["Dikeluarkan", "NIP.", "Kepala", "Dinas", "PLT"]
-last_keywords = ["Tanggal", "NIP"]
+last_keywords = ["NIP"]
 
 def get_words_with_positions(image_path):
     client = vision.ImageAnnotatorClient()
@@ -185,14 +185,69 @@ def clean_officer_name(name):
     cleaned_name = re.sub(r'\s*/\s*', '', name)
     return cleaned_name
 
+def split_lines_into_columns(lines, num_columns=3):
+    # Step 1: Find the maximum x position from all words
+    all_x_positions = [x for line in lines for _, x in line['words']]
+    if not all_x_positions:
+        return {'left': [], 'center': [], 'right': []}
+
+    max_x = max(all_x_positions)
+    column_width = max_x / num_columns
+
+    # Initialize column containers
+    columns = {
+        'left': [],
+        'center': [],
+        'right': []
+    }
+
+    for line in lines:
+        left_words = []
+        center_words = []
+        right_words = []
+
+        for word, x in line['words']:
+            if x < column_width:
+                left_words.append((word, x))
+            elif x < 2 * column_width:
+                center_words.append((word, x))
+            else:
+                right_words.append((word, x))
+
+        if left_words:
+            columns['left'].append({'y': line['y'], 'words': left_words})
+        if center_words:
+            columns['center'].append({'y': line['y'], 'words': center_words})
+        if right_words:
+            columns['right'].append({'y': line['y'], 'words': right_words})
+
+    return columns
+
+def extract_date_from_lines(lines):
+    date_pattern = re.compile(r'\b(\d{1,2})[-/](\d{1,2})[-/](\d{4})\b')
+
+    for line in lines:
+        for word, _ in line['words']:
+            match = date_pattern.search(word)
+            if match:
+                # Format to consistent dd-mm-yyyy
+                day, month, year = match.groups()
+                return f'{int(day):02d}-{int(month):02d}-{year}'
+    return None
+
 def execute(image_path, output_path):
     words = get_words_with_positions(image_path)
     lines = group_words_into_lines(words)
     r_text = reconstructed_text(lines)
     extracted_val = extract_values(r_text)
-    officer_name = find_line_above(lines, "NIP")
+    columns = split_lines_into_columns(lines)
+    date = extract_date_from_lines(columns['left'])
+    officer_name = find_line_above(columns['right'], "NIP")
     if officer_name:
         extracted_val["officer_name"] = clean_officer_name(officer_name)
+    if date:
+        extracted_val["tanggal"] = date
+    print("\nFOOTER RESULT: \n")
     print(extracted_val)
 
     save_to_json(extracted_val,output_path)
