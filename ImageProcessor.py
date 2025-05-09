@@ -21,7 +21,7 @@ HEADER_SOURCE_IMG = "/horizontal_part_1.png"
 FOOTER_SOURCE_IMG = "/horizontal_part_4.png"
 
 class ImageProcessor:
-    def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir, open_window):
+    def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir, open_window, delete_output):
         self.target_path = target_path
         self.template_path = template_path
         self.output_aligned_path = output_aligned_path
@@ -29,13 +29,14 @@ class ImageProcessor:
         self.version = "after_2018"
         self.open_window = open_window
         self.converted_image_path = None  # path to converted PNG if PDF
-        if os.path.exists(OUTPUT_PATH):
+        if os.path.exists(OUTPUT_PATH) and delete_output == "true":
             shutil.rmtree(OUTPUT_PATH)
             print(f"Deleted folder: {OUTPUT_PATH}")
         else:
             print(f"Folder does not exist: {OUTPUT_PATH}")
         # Recreate it
-        os.makedirs(OUTPUT_PATH)
+        if not os.path.exists(OUTPUT_PATH):
+            os.makedirs(OUTPUT_PATH)
 
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON

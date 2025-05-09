@@ -12,6 +12,7 @@ PROCESSED_JSON_PATH = "./output/processed_data.json"
 WORKBOOK_PATH = "./templ/template.xlsx"
 FINAL_PATH = "final.xlsx"
 OPEN_EXPLORER = "true"
+DELETE_OUTPUT_FOLDER = "false"
 
 
 if __name__ == '__main__':
@@ -27,9 +28,10 @@ if __name__ == '__main__':
         OUTPUT_ALIGNED_PATH,
         CROP_OUTPUT_DIR,
         OPEN_EXPLORER,
+        DELETE_OUTPUT_FOLDER
     )
-    processor.run()
-    # processor.extract_table()
+    # processor.run()
+    processor.extract_table()
     # processor.extract_header()
     # processor.extract_footer()
 
