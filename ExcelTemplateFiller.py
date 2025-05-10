@@ -1,6 +1,8 @@
 import json
 from openpyxl import load_workbook
-from openpyxl.utils import column_index_from_string, get_column_letter
+from openpyxl.utils import column_index_from_string
+import tkinter as tk
+from tkinter import filedialog
 
 # Define your sheet name
 SheetName = "Input Form"
@@ -49,7 +51,7 @@ def populate_excel(workbook_path, input_json_path, final_output_path):
     workbook = load_workbook(workbook_path)
 
     # Load your JSON file
-    with open(input_json_path, 'r') as f:
+    with open(input_json_path, encoding='utf-8') as f:
         data = json.load(f)
 
     # Fill in the Excel based on the mapping
@@ -107,6 +109,24 @@ def populate_excel(workbook_path, input_json_path, final_output_path):
                 else:
                     # Single value
                     ws[start_cell] = value
+                    
+    if not final_output_path:
+        # Hide the root window
+        root = tk.Tk()
+        root.withdraw()
 
-    # Save to a new file (or overwrite)
-    workbook.save(final_output_path)
+        # Open the Save As dialog
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")],
+            title="Save Excel File As"
+        )
+
+        # Save if a file was selected
+        if file_path:
+            workbook.save(file_path)
+            print(f"Workbook saved to: {file_path}")
+        else:
+            print("Save cancelled.")
+    else :
+        workbook.save(final_output_path)
