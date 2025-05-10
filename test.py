@@ -3,14 +3,14 @@ import TableLinesRemover as tlr
 import numpy as np
 
     
-img = cv2.imread("./output/sliced_upper_table/column_2.png")
+img = cv2.imread("./output/sliced_upper_table/before_column_4.png")
 grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
 inverted_image = cv2.bitwise_not(thresholded_image)
 
-hor = np.array([[1,1,1,1,1,1,1,1,1,1]])
-vertical_lines_eroded_image = cv2.erode(inverted_image, hor, iterations=10)
-vertical_lines_eroded_image = cv2.dilate(vertical_lines_eroded_image, hor, iterations=10)
+hor = np.array([[1,1,1]])
+vertical_lines_eroded_image = cv2.erode(inverted_image, hor, iterations=2)
+vertical_lines_eroded_image = cv2.dilate(vertical_lines_eroded_image, hor, iterations=3)
 
 cv2.imwrite("after.png", vertical_lines_eroded_image)
 
@@ -19,7 +19,7 @@ cv2.imwrite("after.png", vertical_lines_eroded_image)
 row_sums = np.sum(vertical_lines_eroded_image == 255, axis=1)
 
 # Find all rows where there is a line (tweak threshold if needed)
-line_rows = np.where(row_sums > vertical_lines_eroded_image.shape[1] * 0.5)[0]  # More than 50% white pixels
+line_rows = np.where(row_sums > vertical_lines_eroded_image.shape[1] * 0.9)[0]  # More than 50% white pixels
 
 if len(line_rows) > 0:
     bottom_line_y = line_rows.max()

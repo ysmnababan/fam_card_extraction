@@ -99,18 +99,18 @@ class TableLinesRemover:
         thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
         inverted_image = cv2.bitwise_not(thresholded_image)
 
-        hor = np.array([[1,1,1,1,1,1,1,1,1,1]])
-        vertical_lines_eroded_image = cv2.erode(inverted_image, hor, iterations=10)
-        vertical_lines_eroded_image = cv2.dilate(vertical_lines_eroded_image, hor, iterations=10)
+        hor = np.array([[1,1,1]])
+        vertical_lines_eroded_image = cv2.erode(inverted_image, hor, iterations=2)
+        vertical_lines_eroded_image = cv2.dilate(vertical_lines_eroded_image, hor, iterations=3)
 
-        cv2.imwrite("after.png", vertical_lines_eroded_image)
+        # cv2.imwrite("after.png", vertical_lines_eroded_image)
 
         # --- Find the bottom-most horizontal line ---
         # Sum each row's pixel values (lines will have high sums)
         row_sums = np.sum(vertical_lines_eroded_image == 255, axis=1)
 
         # Find all rows where there is a line (tweak threshold if needed)
-        line_rows = np.where(row_sums > vertical_lines_eroded_image.shape[1] * 0.5)[0]  # More than 50% white pixels
+        line_rows = np.where(row_sums > vertical_lines_eroded_image.shape[1] * 0.7)[0]  # More than 50% white pixels
 
         if len(line_rows) > 0:
             bottom_line_y = line_rows.max()
@@ -157,6 +157,7 @@ class TableLinesRemover:
             x_start = grouped_lines[i]
             x_end = grouped_lines[i + 1]
             column_crop = aligned_img[:, x_start:x_end]
+            cv2.imwrite(f"{output_dir}/before_column_{i+1}.png", column_crop)
             column_crop = self.crop_bottom_of_table(column_crop)
             cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
 
