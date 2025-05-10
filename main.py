@@ -10,10 +10,10 @@ CROP_OUTPUT_DIR = 'cropped_cells'
 JSON_OUTPUT_PATH = "./output/kk_data.json"
 PROCESSED_JSON_PATH = "./output/processed_data.json"
 WORKBOOK_PATH = "./templ/template.xlsx"
-FINAL_PATH = "final.xlsx"
-# FINAL_PATH = ""
+# FINAL_PATH = "final.xlsx"
+FINAL_PATH = ""
 OPEN_EXPLORER = "true"
-DELETE_OUTPUT_FOLDER = "false"
+DELETE_OUTPUT_FOLDER = "true"
 
 
 if __name__ == '__main__':
@@ -32,12 +32,12 @@ if __name__ == '__main__':
         OPEN_EXPLORER,
         DELETE_OUTPUT_FOLDER
     )
-    # processor.run()
+    processor.run()
     # processor.extract_table()
     # processor.extract_header()
     # processor.extract_footer()
 
-    family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
-    family.preprocess(PROCESSED_JSON_PATH)
+    # family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
+    # family.preprocess(PROCESSED_JSON_PATH)
 
-    etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+    # etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
