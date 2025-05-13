@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, asdict
 import json
 import TableScanner as ts 
-
+import ImageProcessor as ip
 
 FULL_NAME_COLUMN_IMAGE_FILE_NAME = "column_1.png"
 NIK_COLUMN_IMAGE_FILE_NAME = "column_2.png"
@@ -20,6 +20,13 @@ PASPOR_NO_COLUMN_IMAGE_FILE_NAME = "column_5.png"
 KITAS_NO_COLUMN_IMAGE_FILE_NAME = "column_6.png"
 FATHER_COLUMN_IMAGE_FILE_NAME = "column_7.png"
 MOTHER_COLUMN_IMAGE_FILE_NAME = "column_8.png"
+
+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME_2018V = "column_2.png"
+CITIZEN_COLUMN_IMAGE_FILE_NAME_2018V = "column_3.png"
+PASPOR_NO_COLUMN_IMAGE_FILE_NAME_2018V = "column_4.png"
+KITAS_NO_COLUMN_IMAGE_FILE_NAME_2018V = "column_5.png"
+FATHER_COLUMN_IMAGE_FILE_NAME_2018V = "column_6.png"
+MOTHER_COLUMN_IMAGE_FILE_NAME_2018V = "column_7.png"
 
 LOWER_TABLE_DIR = "./output/sliced_lower_table/"
 UPPER_TABLE_DIR = "./output/sliced_upper_table/"
@@ -51,7 +58,7 @@ class KKStructure:
         table_scanner = ts.TableScanner()
         self.names = table_scanner.detect_single_image(UPPER_TABLE_DIR+FULL_NAME_COLUMN_IMAGE_FILE_NAME)
         print("scanning names completed")
-     
+    
     def add_niks(self,):
         table_scanner = ts.TableScanner()
         self.niks = table_scanner.detect_single_image(UPPER_TABLE_DIR+NIK_COLUMN_IMAGE_FILE_NAME)
@@ -94,38 +101,59 @@ class KKStructure:
         print("scanning marriage stats completed")
     
     def add_marriage_dates(self,):
+        if self.version == ip.BEFORE_2018V:
+            self.marriage_dates = []
+            return
         table_scanner = ts.TableScanner()
         self.marriage_dates = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_DATE_COLUMN_IMAGE_FILE_NAME)
         print("scanning marriage dates completed")
     
     def add_marriage_rels(self,):
         table_scanner = ts.TableScanner()
-        self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME_2018V)
+        else :
+            self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME)
         print("scanning marriage rels completed")
 
     def add_citizenship(self,):
         table_scanner = ts.TableScanner()
-        self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME_2018V)
+        else :
+            self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME)
         print("scanning citizenship completed")
 
     def add_paspor_no(self,):
         table_scanner = ts.TableScanner()
-        self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME_2018V)
+        else :
+            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME)
         print("scanning paspor numbers completed")
 
     def add_kitas_no(self,):
         table_scanner = ts.TableScanner()
-        self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME_2018V)
+        else:
+            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME)
         print("scanning kitas numbers completed")
     
     def add_father_names(self,):
         table_scanner = ts.TableScanner()
-        self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME_2018V)
+        else :
+            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME)
         print("scanning father names completed")
 
     def add_mother_names(self,):
         table_scanner = ts.TableScanner()
-        self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME)
+        if self.version == ip.BEFORE_2018V:
+            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME_2018V)
+        else : 
+            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME)
         print("scanning mother names completed")
 
     def generate_json(self, filename, template_filename):
@@ -135,8 +163,8 @@ class KKStructure:
 
         # Update the fields in the template with current dataclass values
         for key, value in asdict(self).items():
-            if key in data:
-                data[key] = value  # overwrite only if key exists in template
+            # if key in data:
+            data[key] = value  # overwrite only if key exists in template
 
         # Save back to the same file (or you can specify a different output filename)
         with open(filename, "w") as f:
