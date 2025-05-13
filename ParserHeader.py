@@ -102,6 +102,19 @@ def extract_values(text):
 
     return result
 
+def extract_16_digit_number(text):
+    """
+    Extracts the first 16-digit number from the input text.
+
+    Args:
+        text (str): The input text to search in.
+
+    Returns:
+        str or None: The 16-digit number if found, else None.
+    """
+    match = re.search(r'(?<!\d)(\d{16})(?!\d)', text)
+    return match.group(1) if match else ""
+
 def save_to_json(data, filename):
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -122,4 +135,8 @@ def execute(image_path, output_path):
     lines = group_words_into_lines(words)
     r_text = reconstructed_text(lines)
     extracted_val = extract_values(r_text)
+    no = extract_16_digit_number(r_text)
+    if not no == "" :
+        print(no)
+        extracted_val["no"] = no
     save_to_json(extracted_val,output_path)
