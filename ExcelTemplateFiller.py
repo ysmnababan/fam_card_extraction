@@ -34,6 +34,7 @@ cell_mapping = {
     'educations': (SheetName, 'P10'),
     'profession': (SheetName, 'S10'),
     'marriage_stats': (SheetName, 'B24'),
+    'marriage_dates': ("Sheet1", 'C24'),
 
     # Array of date strings, each like "23-04-2021", needs to be split into K-row, L-row, M-row
     'birthdates': {'sheet': SheetName, 'cell': 'K10', 'split': '-', 'is_array_of_strings': True},
