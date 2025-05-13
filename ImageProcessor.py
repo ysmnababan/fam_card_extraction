@@ -19,6 +19,8 @@ SLICED_LOWER_TABLE = '/sliced_lower_table'
 UNPROCESSED_KK_JSON = 'kk_data.json'
 HEADER_SOURCE_IMG = "/horizontal_part_1.png"
 FOOTER_SOURCE_IMG = "/horizontal_part_4.png"
+BEFORE_2018V = "BEFORE_2018"
+AFTER_2018V = "AFTER_2018"
 
 class ImageProcessor:
     def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir, open_window, delete_output):
@@ -182,9 +184,12 @@ class ImageProcessor:
             cv2.imwrite(f"./output/horizontal_part_{i}.png", cropped)
         
         if (self.upper_column_num == 11 or self.lower_column_num == 10):
-            self.version = "after_2018"
+            self.version = AFTER_2018V
+        elif (self.upper_column_num == 10 or self.lower_column_num == 9):
+            self.version = BEFORE_2018V
         else :
-            self.version = "before_2018"
+            print("failed to crop table")
+            sys.exit(1)
         print(self.version)        
 
         
