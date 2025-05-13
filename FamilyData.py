@@ -1,6 +1,6 @@
 import re
 import json
-from translator import translate
+from translator import translate, translate_date_to_japanese
 
 def preprocess_string(s, unwanted_chars="/-.,"):
     # 1. Remove unwanted characters dynamically using a character class
@@ -103,6 +103,10 @@ class FamilyData:
         self.marriage_stats = [preprocess_string(item, "/-,1234567890") for item in self.marriage_stats]
         self.marriage_stats = [translate(item) for item in self.marriage_stats]
 
+    def preprocess_marriage_dates(self):
+        self.marriage_dates = [keep_only_numbers_and_dash(item) for item in self.marriage_dates]
+        self.marriage_dates = [translate_date_to_japanese(item) for item in self.marriage_dates]
+        
     def preprocess_marriage_rels(self):
         self.marriage_rels = [preprocess_string(item, "/-,1234567890") for item in self.marriage_rels]
         self.marriage_rels = [translate(item) for item in self.marriage_rels]
@@ -151,6 +155,7 @@ class FamilyData:
         self.preprocess_educations()
         self.preprocess_profession()
         self.preprocess_marriage_stats()
+        self.preprocess_marriage_dates()
         self.preprocess_marriage_rels()
         self.preprocess_citizenships()
         self.preprocess_paspor_no()
