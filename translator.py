@@ -1,4 +1,5 @@
 import re  
+from datetime import datetime
 
 translation_mapping = {
     "laki laki": "男性",
@@ -88,3 +89,10 @@ def translate(text):
             return translation  # Return the first matching translation
     
     return text  # If no match, return original
+
+def translate_date_to_japanese(date_str):
+    # Parse the date assuming it's in DD-MM-YYYY format
+    date_obj = datetime.strptime(date_str, "%d-%m-%Y")
+    
+    # Format it as 'YYYY年 M月 D日' with tabs between
+    return f"{date_obj.year}年 {date_obj.month}月 {date_obj.day}日"
