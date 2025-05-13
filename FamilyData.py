@@ -47,11 +47,11 @@ class FamilyData:
         self.no = keep_only_numbers(self.no)
     
     def preprocess_kepala_keluarga(self):
-        self.keluarga = preprocess_string(self.keluarga, "/-,1234567890")
+        self.keluarga = preprocess_string(self.keluarga, "!/-,1234567890")
         self.kep_keluarga = self.keluarga
     
     def preprocess_alamat(self):
-        self.alamat = preprocess_string(self.alamat, "/-,1234567890")
+        self.alamat = preprocess_string(self.alamat, "!/-,1234567890")
 
     def preprocess_rw(self):
         self.rw = keep_only_numbers_and_slash(self.rw)
@@ -60,47 +60,47 @@ class FamilyData:
         self.pos = keep_only_numbers(self.pos)
 
     def preprocess_kelurahan(self):
-        self.kelurahan = preprocess_string(self.kelurahan, "/-,1234567890")
+        self.kelurahan = preprocess_string(self.kelurahan, "!/-,1234567890")
 
     def preprocess_kecamatan(self):
-        self.kecamatan= preprocess_string(self.kecamatan, "/-,1234567890")
+        self.kecamatan= preprocess_string(self.kecamatan, "!/-,1234567890")
     
     def preprocess_kota(self):
-        self.kota = preprocess_string(self.kota, "/-,1234567890")
+        self.kota = preprocess_string(self.kota, "!/-,1234567890")
 
     def preprocess_provinsi(self):
-        self.provinsi = preprocess_string(self.provinsi, "/-,1234567890")
+        self.provinsi = preprocess_string(self.provinsi, "!/-,1234567890")
     
     def preprocess_names(self):
-        self.names = [preprocess_string(name, "/-,1234567890") for name in self.names]
+        self.names = [preprocess_string(name, "!/-,1234567890") for name in self.names]
     
     def preprocess_nik(self):
         self.niks = [keep_only_numbers(nik) for nik in self.niks]
 
     def preprocess_sexes(self):
-        self.sexes = [preprocess_string(sex, "/-,1234567890") for sex in self.sexes]
+        self.sexes = [preprocess_string(sex, "!/-,1234567890") for sex in self.sexes]
         self.sexes = [translate(item) for item in self.sexes]
 
     def preprocess_birthplaces(self):
-        self.birthplaces = [preprocess_string(birthplace, "/-,1234567890") for birthplace in self.birthplaces]
+        self.birthplaces = [preprocess_string(birthplace, "!/-,1234567890") for birthplace in self.birthplaces]
 
     def preprocess_birthdates(self):
         self.birthdates = [keep_only_numbers_and_dash(birthdate) for birthdate in self.birthdates]
 
     def preprocess_religions(self):
-        self.religions = [preprocess_string(religion, "/-,1234567890") for religion in self.religions]
+        self.religions = [preprocess_string(religion, "!/-,1234567890") for religion in self.religions]
         self.religions = [translate(item) for item in self.religions]
 
     def preprocess_educations(self):
-        self.educations = [preprocess_string(education, "-,1234567890") for education in self.educations]
+        self.educations = [preprocess_string(education, "!-,1234567890") for education in self.educations]
         self.educations = [translate(item) for item in self.educations]
 
     def preprocess_profession(self):
-        self.profession = [preprocess_string(p, "-,1234567890") for p in self.profession]
+        self.profession = [preprocess_string(p, "!-,1234567890") for p in self.profession]
         self.profession = [translate(item) for item in self.profession]
 
     def preprocess_marriage_stats(self):
-        self.marriage_stats = [preprocess_string(item, "/-,1234567890") for item in self.marriage_stats]
+        self.marriage_stats = [preprocess_string(item, "!/-,1234567890") for item in self.marriage_stats]
         self.marriage_stats = [translate(item) for item in self.marriage_stats]
 
     def preprocess_marriage_dates(self):
@@ -108,24 +108,24 @@ class FamilyData:
         self.marriage_dates = [translate_date_to_japanese(item) for item in self.marriage_dates]
         
     def preprocess_marriage_rels(self):
-        self.marriage_rels = [preprocess_string(item, "/-,1234567890") for item in self.marriage_rels]
+        self.marriage_rels = [preprocess_string(item, "!/-,1234567890") for item in self.marriage_rels]
         self.marriage_rels = [translate(item) for item in self.marriage_rels]
 
     def preprocess_citizenships(self):
-        self.citizenships = [preprocess_string(item, "/-,1234567890") for item in self.citizenships]
+        self.citizenships = [preprocess_string(item, "!/-,1234567890") for item in self.citizenships]
         self.citizenships = [translate(item) for item in self.citizenships]
 
     def preprocess_paspor_no(self):
-        self.paspor_no = [preprocess_string(item, "/-,") for item in self.paspor_no]
+        self.paspor_no = [preprocess_string(item, "!/-,") for item in self.paspor_no]
 
     def preprocess_kitas_no(self):
-        self.kitas_no = [preprocess_string(item, "/-,") for item in self.kitas_no]
+        self.kitas_no = [preprocess_string(item, "!/-,") for item in self.kitas_no]
 
     def preprocess_father_names(self):
-        self.father_names = [preprocess_string(item, "/-,1234567890") for item in self.father_names]
+        self.father_names = [preprocess_string(item, "!/-,1234567890") for item in self.father_names]
     
     def preprocess_mother_names(self):
-        self.mother_names = [preprocess_string(item, "/-,1234567890") for item in self.mother_names]
+        self.mother_names = [preprocess_string(item, "!/-,1234567890") for item in self.mother_names]
 
     def preprocess_tanggal(self):
         self.tanggal = keep_only_numbers_and_dash(self.tanggal)
