@@ -33,11 +33,11 @@ if __name__ == '__main__':
         DELETE_OUTPUT_FOLDER
     )
     processor.run()
-    # processor.extract_table()
-    # processor.extract_header()
-    # processor.extract_footer()
+    processor.extract_table()
+    processor.extract_header()
+    processor.extract_footer()
 
-    # family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
-    # family.preprocess(PROCESSED_JSON_PATH)
+    family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
+    family.preprocess(PROCESSED_JSON_PATH)
 
-    # etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+    etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
