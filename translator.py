@@ -48,6 +48,7 @@ translation_mapping = {
     "kepala desa": "村長",
     "wiraswasta": "自営業",
     "tidak/belum sekolah": "学歴なし",
+    "tidak/blm sekolah": "学歴なし",
     "belum tamat sd": "小学校未卒",
     "belum tamat sd/sederajat": "小学校未卒",
     "tamat sd/sederajat": "小学校卒業",
