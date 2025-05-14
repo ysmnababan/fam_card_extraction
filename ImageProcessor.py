@@ -11,8 +11,9 @@ from pdf2image import convert_from_path
 import os
 import shutil
 import sys
+from helper import resource_path
 
-JSON_TEMPLATE = "./templ/template.json"
+JSON_TEMPLATE = resource_path("./templ/template.json")
 OUTPUT_PATH = './output'
 SLICED_UPPER_TABLE = '/sliced_upper_table'
 SLICED_LOWER_TABLE = '/sliced_lower_table'
@@ -24,9 +25,9 @@ AFTER_2018V = "AFTER_2018"
 
 class ImageProcessor:
     def __init__(self, target_path, template_path, output_aligned_path, crop_output_dir, open_window, delete_output):
-        self.target_path = target_path
-        self.template_path = template_path
-        self.output_aligned_path = output_aligned_path
+        self.target_path = resource_path(target_path)
+        self.template_path = resource_path(template_path)
+        self.output_aligned_path = resource_path(output_aligned_path)
         self.crop_output_dir = crop_output_dir
         self.version = "after_2018"
         self.open_window = open_window
@@ -64,7 +65,7 @@ class ImageProcessor:
         )
         if not self.target_path:
             print("No file selected.")
-            sys.exit(0)
+            sys.exit(1)
         else:
             print(f"Selected file: {self.target_path}")
 
@@ -104,14 +105,15 @@ class ImageProcessor:
                 target = cv2.imread(img_path)
                 if target is None:
                     print("Failed to load the image.")
-                    sys.exit(0)
+                    sys.exit(1)
                 else:
                     print("Image loaded successfully.")
             else:
                 print("No image to load.")
+                sys.exit(1)
         else:
             print("Run cancelled: no file selected.")
-            sys.exit(0)
+            sys.exit(1)
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
         h_img, w_img = target.shape[:2]
@@ -129,7 +131,7 @@ class ImageProcessor:
 
         if len(clicked_points) != 4:
             print("You must select exactly 4 points.")
-            exit()
+            sys.exit(1)
 
         clicked_points = clicker.order_points_clockwise(clicked_points)
 

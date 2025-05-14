@@ -3,6 +3,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
 import tkinter as tk
 from tkinter import filedialog
+from helper import resource_path
 
 # Define your sheet name
 SheetName = "Input Form"
@@ -49,7 +50,7 @@ cell_mapping = {
 
 def populate_excel(workbook_path, input_json_path, final_output_path):
     # Load your Excel file
-    workbook = load_workbook(workbook_path)
+    workbook = load_workbook(resource_path(workbook_path))
 
     # Load your JSON file
     with open(input_json_path, encoding='utf-8') as f:
