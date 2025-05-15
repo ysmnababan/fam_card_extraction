@@ -2,13 +2,12 @@ FAMILY CARD EXTRACTION APP
 
 You will get 3 items:
 1. The main program
-2. The secret credential file (do not share this with another user)
-3. This Note.txt
+2. The app credential folder (do not share this with another user)
+3. This 'note.txt'
 
 1. HOW TO INSTALL
-    - Create new folder named 'app_credentials' in you C:
-    - Unzip the credential file, this is encrypted so please insert the password to open
-    - Inside it, you will see a .json file. Cut the json file into the 'app_credentials' folder you've created
+    - Unzip the credential folder, this is encrypted so please insert the password to open
+    - Cut or copy the 'app_credentials' folder into your C:// directory. 
     - Unzip the main program
     - You can run the program by double click the main.exe
 
