@@ -1,0 +1,21 @@
+FAMILY CARD EXTRACTION APP
+
+You will get 3 items:
+1. The main program
+2. The secret credential file (do not share this with another user)
+3. This Note.txt
+
+1. HOW TO INSTALL
+    - Create new folder named 'app_credentials' in you C:
+    - Unzip the credential file, this is encrypted so please insert the password to open
+    - Inside it, you will see a .json file. Cut the json file into the 'app_credentials' folder you've created
+    - Unzip the main program
+    - You can run the program by double click the main.exe
+
+2. HOW TO RUN THE PROGRAM
+    - Make sure you have connected to the internet
+    - Double click the main.exe
+    - Select the 'Kartu Keluarga' file (in pdf or image file) that you want to extract the data from
+    - Please select the 4 corner of the table exactly at the table edge 
+    - Wait until the program finish
+    - Save the excel file to a particular folder
