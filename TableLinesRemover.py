@@ -71,7 +71,7 @@ class TableLinesRemover:
                 break
         cv2.destroyAllWindows()
     
-    def visualize_vertical_lines(self, image, grouped_lines, color=(0, 255, 0), thickness=2):
+    def visualize_vertical_lines(self, image, grouped_lines, color=(0, 255, 0), thickness=4):
         """
         Draw vertical lines on the image for visual debugging.
         `grouped_lines` should be a list of x-coordinates.
@@ -142,7 +142,7 @@ class TableLinesRemover:
         line_img = self.horizontal_lines_eroded_image
         # Find vertical lines as non-zero columns
         cols_sum = np.sum(line_img > 0, axis=0)  # Sum vertically to find white lines
-        threshold = line_img.shape[0] * 0.5  # Adjust: 50% of image height
+        threshold = line_img.shape[0] * 0.6  # Adjust: 50% of image height
 
         # Get the x-coordinates of white vertical lines
         line_positions = np.where(cols_sum > threshold)[0]
