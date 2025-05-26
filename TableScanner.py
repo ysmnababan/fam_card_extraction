@@ -1,5 +1,8 @@
 from google.cloud import vision
 import io
+import cv2
+import numpy as np
+import os
 
 class TableScanner:
     def filter_number_lines(self, lines):
@@ -13,10 +16,60 @@ class TableScanner:
             return lines[start_idx:]
         else:
             return []  # no valid data found
-    
-    def detect_single_image(self, image_path):
+
+    def crop_above_nth_horizontal_line_with_grouping(self, img, n=3, line_gap=10):
+        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
+        inverted_image = cv2.bitwise_not(thresholded_image)
+
+        hor = np.array([[1, 1, 1,]])
+        eroded = cv2.erode(inverted_image, hor, iterations=2)
+        dilated = cv2.dilate(eroded, hor, iterations=3)
+
+        row_sums = np.sum(dilated == 255, axis=1)
+        line_rows = np.where(row_sums > dilated.shape[1] * 0.9)[0]
+
+        # print("Raw line rows:", line_rows)
+        # Group nearby line rows (e.g., within 10px)
+        grouped_lines = []
+        current_group = []
+
+        for y in line_rows:
+            if not current_group or y - current_group[-1] <= line_gap:
+                current_group.append(y)
+            else:
+                grouped_lines.append(current_group)
+                current_group = [y]
+
+        if current_group:
+            grouped_lines.append(current_group)
+
+        # Get the Y position of each unique line group (e.g., middle of the group)
+        line_positions = [group[len(group) // 2] for group in grouped_lines]
+
+        # print("Grouped horizontal line positions:", line_positions)
+
+        if len(line_positions) >= n:
+            nth_line_y = line_positions[n - 1]
+            crop_y = min(img.shape[0], nth_line_y + 2)  # margin below line
+            cropped = img[crop_y:, :]
+            print(f"Cropped above line {n} at Y={crop_y}")
+            return cropped
+        else:
+            print(f"Only found {len(line_positions)} lines, can't crop at line {n}")
+            return img
+
+    def detect_single_image(self, image_path, n=3):
+        directory = os.path.dirname(image_path)   # './output/sliced_lower_table'
+        filename = os.path.basename(image_path)   # 'column_2.png'
+
+        image = cv2.imread(image_path)
+        cropped_image = self.crop_above_nth_horizontal_line_with_grouping(img=image,n=n)
+        cropped_image_path = directory + "/header_cropped_" + filename
+        cv2.imwrite(cropped_image_path, cropped_image)
+        
         client = vision.ImageAnnotatorClient()
-        with io.open(image_path, 'rb') as image_file:
+        with io.open(cropped_image_path, 'rb') as image_file:
             content = image_file.read()
         image = vision.Image(content=content)
 
@@ -69,8 +122,8 @@ class TableScanner:
 
         if current_line:
             merged_lines.append(current_line.strip())
-
-        return self.filter_number_lines(merged_lines)
+        return merged_lines
+        # return self.filter_number_lines(merged_lines)
     
     def extract_document_text_from_image(self, image_path):
         """Extract structured text and bounding boxes from an image using Google Vision API."""
