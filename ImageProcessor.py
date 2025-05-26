@@ -155,7 +155,9 @@ class ImageProcessor:
         print("Transformed points (in aligned image):")
         for pt in transformed_points:
             print(f"({pt[0]:.2f}, {pt[1]:.2f})")
+        self.crop_transformed_image(transformed_points, aligned_target)
 
+    def crop_transformed_image(self, transformed_points, aligned_target):
         y_values = transformed_points[:, 1]
         top_y = int(min(y_values))
         bottom_y = int(max(y_values))
@@ -192,8 +194,6 @@ class ImageProcessor:
         else :
             print("failed to crop table")
             sys.exit(1)
-        print(self.version)        
-
-        
+        print(self.version)         
         
         
