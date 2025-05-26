@@ -139,36 +139,36 @@ class KKStructure:
     def add_paspor_no(self,):
         table_scanner = ts.TableScanner()
         if self.version == ip.BEFORE_2018V:
-            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME_2018V)
+            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else :
-            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME)
+            self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME,4)
         print("PASPOR NO: ", self.paspor_no)
         print("scanning paspor numbers completed\n\n")
 
     def add_kitas_no(self,):
         table_scanner = ts.TableScanner()
         if self.version == ip.BEFORE_2018V:
-            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME_2018V)
+            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else:
-            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME)
+            self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME,4)
         print("KITAS NO: ",self.kitas_no)
         print("scanning kitas numbers completed\n\n")
     
     def add_father_names(self,):
         table_scanner = ts.TableScanner()
         if self.version == ip.BEFORE_2018V:
-            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME_2018V)
+            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else :
-            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME)
+            self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME,4)
         print("FATHER NAMES: ",self.father_names)
         print("scanning father names completed\n\n")
 
     def add_mother_names(self,):
         table_scanner = ts.TableScanner()
         if self.version == ip.BEFORE_2018V:
-            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME_2018V)
+            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else : 
-            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME)
+            self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME,4)
         print("MOTHER NAMES: ", self.mother_names)
         print("scanning mother names completed\n\n")
 
