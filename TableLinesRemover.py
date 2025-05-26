@@ -136,6 +136,73 @@ class TableLinesRemover:
         else:
             print("No horizontal lines found.")
             return img
+
+    def crop_above_table_header(self, img):
+        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
+        inverted_image = cv2.bitwise_not(thresholded_image)
+
+        hor = np.array([[1, 1, 1,]])
+        processed = cv2.erode(inverted_image, hor, iterations=1)
+        processed = cv2.dilate(processed, hor, iterations=3)
+
+        row_sums = np.sum(processed == 255, axis=1)
+        
+        # Find horizontal lines by thresholding how many white pixels per row
+        line_rows = np.where(row_sums > processed.shape[1] * 0.9)[0]
+        # debug_img = visualize_line_rows(img, line_rows)
+        # cv2.imshow("Line Rows", debug_img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        if len(line_rows) > 0:
+            top_line_y = line_rows.min()
+            margin = -12  # Optional: include a few pixels above
+            crop_y = min(img.shape[0], top_line_y + margin)
+            if crop_y <0 :
+                crop_y = 0
+            cropped = img[crop_y:, :]
+            print(f"Cropped below top horizontal line at Y={img.shape[0]}->{top_line_y}")
+            return cropped
+        else:
+            print("No horizontal lines found.")
+            return img
+        
+    def deskew_projection_method(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (9, 9), 0)
+        _, binary = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+        # Edge detection
+        edges = cv2.Canny(binary, 50, 150, apertureSize=3)
+
+        # Detect lines
+        lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=200)
+
+        if lines is None:
+            print("No lines detected for skew correction.")
+            return image, 0
+
+        angles = []
+
+        for line in lines:
+            rho, theta = line[0]
+            angle = (theta * 180 / np.pi) - 90
+            if -45 < angle < 45:  # focus on near-horizontal lines
+                angles.append(angle)
+
+        if len(angles) == 0:
+            return image, 0
+
+        avg_angle = np.mean(angles)
+        print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
+
+        # Rotate image
+        (h, w) = image.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, avg_angle, 1.0)
+        rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+        return rotated, avg_angle
     
     def crop_table(self, output_dir):
         os.makedirs(output_dir, exist_ok=True)
@@ -167,8 +234,13 @@ class TableLinesRemover:
             x_start = grouped_lines[i]
             x_end = grouped_lines[i + 1]
             column_crop = aligned_img[:, x_start:x_end]
+            column_crop, angle = self.deskew_projection_method(column_crop)
+            print(f"Image deskewed by {angle:.2f} degrees")
             cv2.imwrite(f"{output_dir}/before_column_{i+1}.png", column_crop)
             column_crop = self.crop_bottom_of_table(column_crop)
+            cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
+            image = cv2.imread(f"{output_dir}/column_{i+1}.png")
+            column_crop = self.crop_above_table_header(image)
             cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
 
         print(f"Cropped {len(grouped_lines) - 1} columns.")
