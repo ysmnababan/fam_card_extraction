@@ -110,17 +110,17 @@ def crop_above_nth_horizontal_line_with_grouping(img, n, line_gap=10):
     inverted_image = cv2.bitwise_not(thresholded_image)
 
     hor = np.array([[1, 1, 1,]])
-    eroded = cv2.erode(inverted_image, hor, iterations=6)
+    eroded = cv2.erode(inverted_image, hor, iterations=1)
     dilated = cv2.dilate(eroded, hor, iterations=3)
 
     row_sums = np.sum(dilated == 255, axis=1)
-    line_rows = np.where(row_sums > dilated.shape[1] * 0.6)[0]
+    line_rows = np.where(row_sums > dilated.shape[1] * 0.9)[0]
 
     print("Raw line rows:", line_rows)
-    # debug_img = visualize_line_rows(img, line_rows)
-    # cv2.imshow("Line Rows", debug_img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    debug_img = visualize_line_rows(img, line_rows)
+    cv2.imshow("Line Rows", debug_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     # Group nearby line rows (e.g., within 10px)
     grouped_lines = []
     current_group = []
@@ -289,13 +289,13 @@ def crop_above_table_header(img):
     inverted_image = cv2.bitwise_not(thresholded_image)
 
     hor = np.array([[1, 1, 1,]])
-    processed = cv2.erode(inverted_image, hor, iterations=2)
+    processed = cv2.erode(inverted_image, hor, iterations=1)
     processed = cv2.dilate(processed, hor, iterations=3)
 
     row_sums = np.sum(processed == 255, axis=1)
     
     # Find horizontal lines by thresholding how many white pixels per row
-    line_rows = np.where(row_sums > processed.shape[1] * 0.6)[0]
+    line_rows = np.where(row_sums > processed.shape[1] * 0.9)[0]
     debug_img = visualize_line_rows(img, line_rows)
     cv2.imshow("Line Rows", debug_img)
     cv2.waitKey(0)
@@ -358,13 +358,13 @@ def crop_above_table_header_hough(img, angle_tolerance=10):
     cv2.destroyAllWindows()
 
     return cropped    
-img = cv2.imread("./output/sliced_lower_table/before_column_8.png")
+img = cv2.imread("./output/sliced_lower_table/before_column_5.png")
 
 deskewed, angle = deskew_projection_method(img)
+print(f"Image deskewed by {angle:.2f} degrees")
 cv2.imwrite("deskewed.png", deskewed)
 
 above_crop = crop_above_table_header(deskewed)
-print(f"Image deskewed by {angle:.2f} degrees")
 cv2.imwrite("above_crop.png", above_crop)
 
 output_img = crop_above_nth_horizontal_line_with_grouping(above_crop, 3)
