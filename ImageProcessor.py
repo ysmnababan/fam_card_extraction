@@ -185,9 +185,9 @@ class ImageProcessor:
                 self.lower_column_num = lines_remover.get_column()
             cv2.imwrite(f"./output/horizontal_part_{i}.png", cropped)
         
-        if (self.upper_column_num == 11 or self.lower_column_num == 10):
+        if (self.upper_column_num == 11 and self.lower_column_num == 10):
             self.version = AFTER_2018V
-        elif (self.upper_column_num == 10 or self.lower_column_num == 9):
+        elif (self.upper_column_num == 10 and self.lower_column_num == 9):
             self.version = BEFORE_2018V
         else :
             print("failed to crop table")
