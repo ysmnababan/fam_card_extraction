@@ -21,8 +21,6 @@ if __name__ == '__main__':
     if os.path.exists(FINAL_PATH):
         os.remove(FINAL_PATH)
         print(f"Deleted file: {FINAL_PATH}")
-    else:
-        print(f"File does not exist: {FINAL_PATH}")
         
     processor = ip.ImageProcessor(
         TARGET_IMAGE_PATH,
