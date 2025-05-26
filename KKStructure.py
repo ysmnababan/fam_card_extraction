@@ -58,47 +58,56 @@ class KKStructure:
         table_scanner = ts.TableScanner()
         self.names = table_scanner.detect_single_image(UPPER_TABLE_DIR+FULL_NAME_COLUMN_IMAGE_FILE_NAME)
         print("scanning names completed")
+        print(self.names)
     
     def add_niks(self,):
         table_scanner = ts.TableScanner()
         self.niks = table_scanner.detect_single_image(UPPER_TABLE_DIR+NIK_COLUMN_IMAGE_FILE_NAME)
         print("scanning niks completed")
+        print(self.niks)
 
     def add_sexes(self,):
         table_scanner = ts.TableScanner()
         self.sexes = table_scanner.detect_single_image(UPPER_TABLE_DIR+SEXES_COLUMN_IMAGE_FILE_NAME)
         print("scanning sexes completed")
+        print(self.sexes)
 
     def add_birthplaces(self,):
         table_scanner = ts.TableScanner()
         self.birthplaces = table_scanner.detect_single_image(UPPER_TABLE_DIR+BIRTHPLACE_COLUMN_IMAGE_FILE_NAME )
         print("scanning birthplaces completed")
+        print(self.birthplaces)
     
     def add_birthdates(self,):
         table_scanner = ts.TableScanner()
         self.birthdates = table_scanner.detect_single_image(UPPER_TABLE_DIR+BIRTHDATE_COLUMN_IMAGE_FILE_NAME)
         print("scanning birthdates completed")
+        print(self.birthdates)
 
     def add_religions(self,):
         table_scanner = ts.TableScanner()
         self.religions = table_scanner.detect_single_image(UPPER_TABLE_DIR+RELIGION_COLUMN_IMAGE_FILE_NAME)
         print("scanning religions completed")
+        print(self.religions)
 
     def add_educations(self,):
         table_scanner = ts.TableScanner()
         self.educations = table_scanner.detect_single_image(UPPER_TABLE_DIR+EDUCATION_COLUMN_IMAGE_FILE_NAME)
         print("scanning educations completed")
+        print(self.educations)
 
     def add_profession(self,):
         table_scanner = ts.TableScanner()
         self.profession = table_scanner.detect_single_image(UPPER_TABLE_DIR+PROFESION_COLUMN_IMAGE_FILE_NAME)
         print("scanning professions completed")
+        print(self.profession)
 
 # +++++++++++++++++++++++++
     def add_marriage_stats(self,):
         table_scanner = ts.TableScanner()
         self.marriage_stats = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_STAT_COLUMN_IMAGE_FILE_NAME)
         print("scanning marriage stats completed")
+        print(self.marriage_stats)
     
     def add_marriage_dates(self,):
         if self.version == ip.BEFORE_2018V:
@@ -107,6 +116,7 @@ class KKStructure:
         table_scanner = ts.TableScanner()
         self.marriage_dates = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_DATE_COLUMN_IMAGE_FILE_NAME)
         print("scanning marriage dates completed")
+        print(self.marriage_dates)
     
     def add_marriage_rels(self,):
         table_scanner = ts.TableScanner()
@@ -115,6 +125,7 @@ class KKStructure:
         else :
             self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME)
         print("scanning marriage rels completed")
+        print(self.marriage_rels)
 
     def add_citizenship(self,):
         table_scanner = ts.TableScanner()
@@ -123,6 +134,7 @@ class KKStructure:
         else :
             self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME)
         print("scanning citizenship completed")
+        print(self.citizenships)
 
     def add_paspor_no(self,):
         table_scanner = ts.TableScanner()
@@ -131,6 +143,7 @@ class KKStructure:
         else :
             self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME)
         print("scanning paspor numbers completed")
+        print(self.paspor_no)
 
     def add_kitas_no(self,):
         table_scanner = ts.TableScanner()
@@ -139,6 +152,7 @@ class KKStructure:
         else:
             self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME)
         print("scanning kitas numbers completed")
+        print(self.kitas_no)
     
     def add_father_names(self,):
         table_scanner = ts.TableScanner()
@@ -147,6 +161,7 @@ class KKStructure:
         else :
             self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME)
         print("scanning father names completed")
+        print(self.father_names)
 
     def add_mother_names(self,):
         table_scanner = ts.TableScanner()
@@ -155,6 +170,7 @@ class KKStructure:
         else : 
             self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME)
         print("scanning mother names completed")
+        print(self.mother_names)
 
     def generate_json(self, filename, template_filename):
         # Load the existing template JSON
