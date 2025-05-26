@@ -156,37 +156,7 @@ class ImageProcessor:
         for pt in transformed_points:
             print(f"({pt[0]:.2f}, {pt[1]:.2f})")
         self.crop_transformed_image(transformed_points, aligned_target)
-
-    def crop_transformed_image(self, transformed_points, aligned_target):
-        y_values = transformed_points[:, 1]
-        top_y = int(min(y_values))
-        bottom_y = int(max(y_values))
-        mid_y = (top_y + bottom_y) // 2
-
-        height, width = aligned_target.shape[:2]
-        PADDING = 30
-        regions = [
-            (0, top_y + PADDING),
-            (top_y, mid_y + PADDING),
-            (mid_y, bottom_y + PADDING),
-            (bottom_y, height)
-        ]
-
-        for i, (start_y, end_y) in enumerate(regions, start=1):
-            cropped = aligned_target[start_y:end_y, :]
-            output_dir = OUTPUT_PATH
-            if i == 2 :
-                output_dir += SLICED_UPPER_TABLE
-                lines_remover = tlr.TableLinesRemover(cropped)
-                lines_remover.execute(output_dir)
-                self.upper_column_num = lines_remover.get_column()
-            elif i == 3:
-                output_dir += SLICED_LOWER_TABLE
-                lines_remover = tlr.TableLinesRemover(cropped)
-                lines_remover.execute(output_dir)
-                self.lower_column_num = lines_remover.get_column()
-            cv2.imwrite(f"./output/horizontal_part_{i}.png", cropped)
-        
+        self.chop_table_by_column()
         if (self.upper_column_num == 11 and self.lower_column_num == 10):
             self.version = AFTER_2018V
         elif (self.upper_column_num == 10 and self.lower_column_num == 9):
@@ -194,6 +164,73 @@ class ImageProcessor:
         else :
             print("failed to crop table")
             sys.exit(1)
-        print(self.version)         
+        print(self.version)    
         
+
+    def chop_table_by_column(self):
+        lines_remover = tlr.TableLinesRemover(self.upper_table)
+        lines_remover.execute(OUTPUT_PATH + SLICED_UPPER_TABLE)
+        self.upper_column_num = lines_remover.get_column()
         
+        lines_remover = tlr.TableLinesRemover(self.lower_table)
+        lines_remover.execute(OUTPUT_PATH+SLICED_LOWER_TABLE)
+        self.lower_column_num = lines_remover.get_column()
+        return
+
+    def crop_upper_and_lower_space(self, img):
+        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
+        inverted_image = cv2.bitwise_not(thresholded_image)
+
+        hor = np.array([[1, 1, 1]])
+        processed = cv2.erode(inverted_image, hor, iterations=1)
+        processed = cv2.dilate(processed, hor, iterations=3)
+
+        row_sums = np.sum(processed == 255, axis=1)
+        
+        # Find horizontal lines by thresholding how many white pixels per row
+        line_rows = np.where(row_sums > processed.shape[1] * 0.25)[0]
+        if len(line_rows) > 0:
+            margin = 15
+            top_line_y = max(line_rows.min() - margin, 0)  # Add small margin above
+            bottom_line_y = min(line_rows.max() + margin, img.shape[0])  # Add small margin below
+
+            cropped = img[top_line_y:bottom_line_y, :]
+            print(f"Cropped image from Y={top_line_y} to Y={bottom_line_y}")
+            return cropped
+        else:
+            print("No horizontal lines found.")
+            return img
+
+    def crop_in_middle(self, cropped):
+        # Get height and calculate midpoint
+        height = cropped.shape[0]
+        midpoint = height // 2
+
+        # Split into upper and lower halves
+        self.upper_table = cropped[:midpoint, :]
+        self.lower_table = cropped[midpoint:, :]
+
+        # Save both halves
+        cv2.imwrite(OUTPUT_PATH+"/upper_table.png", self.upper_table)
+        cv2.imwrite(OUTPUT_PATH+"/lower_table.png", self.lower_table)
+        
+    def crop_transformed_image(self, transformed_points, aligned_target):
+        y_values = transformed_points[:, 1]
+        top_y = int(min(y_values))
+        bottom_y = int(max(y_values))
+
+        height, _ = aligned_target.shape[:2]
+        PADDING = 30
+        regions = [
+            (0, top_y + PADDING),
+            (top_y-100, bottom_y+100),
+            (bottom_y, height)
+        ]
+
+        for i, (start_y, end_y) in enumerate(regions, start=1):
+            cropped = aligned_target[start_y:end_y, :]
+            cv2.imwrite(f"{OUTPUT_PATH}/horizontal_part_{i}.png", cropped)
+            if i == 2:
+                cropped = self.crop_upper_and_lower_space(cropped)
+                self.crop_in_middle(cropped)
