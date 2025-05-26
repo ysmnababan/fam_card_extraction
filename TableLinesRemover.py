@@ -63,6 +63,14 @@ class TableLinesRemover:
         path = self.output_dir +"/" + file_name
         cv2.imwrite(path, image)
 
+    def show_image_blocking(self, img, window_name="Image"):
+        cv2.imshow(window_name, img)
+        while True:
+            key = cv2.waitKey(0) & 0xFF
+            if key == ord('q'):
+                break
+        cv2.destroyAllWindows()
+    
     def visualize_vertical_lines(self, image, grouped_lines, color=(0, 255, 0), thickness=2):
         """
         Draw vertical lines on the image for visual debugging.
@@ -71,6 +79,7 @@ class TableLinesRemover:
         img_copy = image.copy()
         for x in grouped_lines:
             cv2.line(img_copy, (x, 0), (x, img_copy.shape[0]), color, thickness)
+        # self.show_image_blocking(img_copy)
         return img_copy
     
     def group_close_positions(self, positions, min_dist=15):
@@ -129,6 +138,7 @@ class TableLinesRemover:
             return img
     
     def crop_table(self, output_dir):
+        os.makedirs(output_dir, exist_ok=True)
         line_img = self.horizontal_lines_eroded_image
         # Find vertical lines as non-zero columns
         cols_sum = np.sum(line_img > 0, axis=0)  # Sum vertically to find white lines
@@ -136,12 +146,13 @@ class TableLinesRemover:
 
         # Get the x-coordinates of white vertical lines
         line_positions = np.where(cols_sum > threshold)[0]
-        print(line_positions)
+        print("LINE POSITIONS",line_positions)
         grouped_lines = self.group_close_positions(line_positions, min_dist=65)
 
         # Visualize the result
         visual_img = self.visualize_vertical_lines(self.image, grouped_lines)
-        cv2.imwrite(self.output_dir +"/grouped_columns_preview.png", visual_img)
+        success = cv2.imwrite(f"{output_dir}/grouped_columns_preview.png", visual_img)
+        print("Image saved successfully:", success)
         self.column = len(grouped_lines)
         print(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
@@ -151,7 +162,6 @@ class TableLinesRemover:
         aligned_img = self.image
 
         # Crop between each pair of dividers
-        os.makedirs(output_dir, exist_ok=True)
 
         for i in range(len(grouped_lines) - 1):
             x_start = grouped_lines[i]
