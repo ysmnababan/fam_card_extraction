@@ -1,6 +1,6 @@
 import re
 import json
-from translator import translate, translate_date_to_japanese
+from translator import translate, translate_date_to_japanese, translate_citizenship
 
 def filter_after_separator(input_list):
     # Pattern: matches strings like "(4)", "( 4 )", etc.
@@ -115,7 +115,7 @@ class FamilyData:
         self.religions = [translate(item) for item in self.religions]
 
     def preprocess_educations(self):
-        self.educations = filter_after_separator(self.religions)
+        self.educations = filter_after_separator(self.educations)
         self.educations = [preprocess_string(education, "!-,1234567890") for education in self.educations]
         self.educations = [translate(item) for item in self.educations]
 
@@ -142,7 +142,7 @@ class FamilyData:
     def preprocess_citizenships(self):
         self.citizenships = filter_after_separator(self.citizenships)
         self.citizenships = [preprocess_string(item, "!/-,1234567890") for item in self.citizenships]
-        self.citizenships = [translate(item) for item in self.citizenships]
+        self.citizenships = [translate_citizenship(item) for item in self.citizenships]
 
     def preprocess_paspor_no(self):
         self.paspor_no = filter_after_separator(self.paspor_no)

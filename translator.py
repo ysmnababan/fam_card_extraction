@@ -1,6 +1,6 @@
 import re  
 from datetime import datetime
-
+from deep_translator import GoogleTranslator
 translation_mapping = {
     "laki laki": "男性",
     "pria": "男性",
@@ -47,7 +47,11 @@ translation_mapping = {
     "perangkat desa": "役人",
     "kepala desa": "村長",
     "wiraswasta": "自営業",
+    "perawat": "看護師",
     "tidak/belum sekolah": "学歴なし",
+    "tidak sekolah": "学歴なし",
+    "belum sekolah": "学歴なし",
+    "blm sekolah": "学歴なし",
     "tidak/blm sekolah": "学歴なし",
     "belum tamat sd": "小学校未卒",
     "belum tamat sd/sederajat": "小学校未卒",
@@ -56,9 +60,13 @@ translation_mapping = {
     "slta/sederajat": "高校卒業",
     "diploma i/ii": "短大",
     "akademi/diploma iii/sarjana muda": "専門学校",
+    "sarjana muda": "専門学校",
     "diploma iv/strata i": "大学",
+    "diploma iv/strata i": "大学",
+    "diploma iv": "大学",
     "strata iii": "博士課程",
     "strata ii": "大学院",
+    "strata i": "大学",
     "kepala keluarga": "家長",
     "suami": "夫",
     "istri": "妻",
@@ -71,12 +79,27 @@ translation_mapping = {
     "famili lain": "他の家族",
     "pembantu": "使用人",
     "lainnya": "その他",
-    "indonesia":"インドネシア",
-    "wn":"インドネシア",
-    "wni":"インドネシア",
 }
 
 
+# translator = Translator()  
+def translate_to_japanese(text: str) -> str:
+    # Attempt to translate text
+    try:
+        translated = GoogleTranslator(source='id', target='ja').translate(text)
+        # Return original if translation is just katakana version (e.g. "Computer" ➜ "コンピューター")
+        if is_katakana_or_alphabet(translated):
+            print(text," ---> ", translated, " : FAILED")
+            return text
+        return translated
+    except Exception:
+        return text  # fallback if API fails
+
+def is_katakana_or_alphabet(s: str) -> bool:
+    for c in s:
+        if ('\u30A0' <= c <= '\u30FF') or ('A' <= c <= 'Z') or ('a' <= c <= 'z'):
+            return True
+    return False
 
 def normalize_text(text):
     # Remove spaces around slashes for consistency (e.g., 'slta / sederajat' to 'slta/sederajat')
@@ -89,7 +112,20 @@ def translate(text):
         if key in normalized_text:
             return translation  # Return the first matching translation
     
-    return text  # If no match, return original
+    return translate_to_japanese(normalized_text)  # If no match, return original
+    # return normalized_text  # If no match, return original
+
+def translate_citizenship(item):
+    item = normalize_text(item)
+    
+    if item == "wn" or item == "wni" or item == "indonesia":
+        return "インドネシア"
+    try:
+        translated = GoogleTranslator(source='id', target='ja').translate(item)
+        # Return original if translation is just katakana version (e.g. "Computer" ➜ "コンピューター")
+        return translated
+    except Exception:
+        return item  # fallback if API fails
 
 def translate_date_to_japanese(date_str, default_value=""):
     formats = ["%d-%m-%Y", "%d.%m.%Y", "%-d-%-m-%Y", "%-d.%-m.%Y"]  # Optional: handle single-digit d/m with `-`
