@@ -2,6 +2,17 @@ import re
 import json
 from translator import translate, translate_date_to_japanese
 
+def filter_after_separator(input_list):
+    # Pattern: matches strings like "(4)", "( 4 )", etc.
+    pattern = re.compile(r'^\s*\(\s*\d{1,2}\s*\)\s*$')
+    
+    for i, item in enumerate(input_list):
+        if pattern.match(item):
+            return input_list[i+1:]
+    
+    # If no separator found, return original list
+    return input_list
+
 def preprocess_string(s, unwanted_chars="/-.,"):
     # 1. Remove unwanted characters dynamically using a character class
     pattern = f"[{re.escape(unwanted_chars)}]"
@@ -72,59 +83,75 @@ class FamilyData:
         self.provinsi = preprocess_string(self.provinsi, "!/-,1234567890")
     
     def preprocess_names(self):
+        self.names = filter_after_separator(self.names)
         self.names = [preprocess_string(name, "!/-,1234567890") for name in self.names]
     
     def preprocess_nik(self):
+        self.niks = filter_after_separator(self.niks)
         self.niks = [keep_only_numbers(nik) for nik in self.niks]
 
     def preprocess_sexes(self):
+        self.sexes = filter_after_separator(self.sexes)
         self.sexes = [preprocess_string(sex, "!/-,1234567890") for sex in self.sexes]
         self.sexes = [translate(item) for item in self.sexes]
 
     def preprocess_birthplaces(self):
+        self.birthplaces = filter_after_separator(self.birthplaces)
         self.birthplaces = [preprocess_string(birthplace, "!/-,1234567890") for birthplace in self.birthplaces]
 
     def preprocess_birthdates(self):
+        self.birthdates = filter_after_separator(self.birthdates) 
         self.birthdates = [keep_only_numbers_and_dash(birthdate) for birthdate in self.birthdates]
 
     def preprocess_religions(self):
+        self.religions = filter_after_separator(self.religions)
         self.religions = [preprocess_string(religion, "!/-,1234567890") for religion in self.religions]
         self.religions = [translate(item) for item in self.religions]
 
     def preprocess_educations(self):
+        self.educations = filter_after_separator(self.religions)
         self.educations = [preprocess_string(education, "!-,1234567890") for education in self.educations]
         self.educations = [translate(item) for item in self.educations]
 
     def preprocess_profession(self):
+        self.profession = filter_after_separator(self.profession)
         self.profession = [preprocess_string(p, "!-,1234567890") for p in self.profession]
         self.profession = [translate(item) for item in self.profession]
 
     def preprocess_marriage_stats(self):
+        self.marriage_stats = filter_after_separator(self.marriage_stats)
         self.marriage_stats = [preprocess_string(item, "!/-,1234567890") for item in self.marriage_stats]
         self.marriage_stats = [translate(item) for item in self.marriage_stats]
 
     def preprocess_marriage_dates(self):
+        self.marriage_dates = filter_after_separator(self.marriage_dates)
         self.marriage_dates = [keep_only_numbers_and_dash(item) for item in self.marriage_dates]
         self.marriage_dates = [translate_date_to_japanese(item) for item in self.marriage_dates]
         
     def preprocess_marriage_rels(self):
+        self.marriage_rels = filter_after_separator(self.marriage_rels)
         self.marriage_rels = [preprocess_string(item, "!/-,1234567890") for item in self.marriage_rels]
         self.marriage_rels = [translate(item) for item in self.marriage_rels]
 
     def preprocess_citizenships(self):
+        self.citizenships = filter_after_separator(self.citizenships)
         self.citizenships = [preprocess_string(item, "!/-,1234567890") for item in self.citizenships]
         self.citizenships = [translate(item) for item in self.citizenships]
 
     def preprocess_paspor_no(self):
+        self.paspor_no = filter_after_separator(self.paspor_no)
         self.paspor_no = [preprocess_string(item, "!/-,") for item in self.paspor_no]
 
     def preprocess_kitas_no(self):
+        self.kitas_no = filter_after_separator(self.kitas_no)
         self.kitas_no = [preprocess_string(item, "!/-,") for item in self.kitas_no]
 
     def preprocess_father_names(self):
+        self.father_names = filter_after_separator(self.father_names)
         self.father_names = [preprocess_string(item, "!/-,1234567890") for item in self.father_names]
     
     def preprocess_mother_names(self):
+        self.mother_names = filter_after_separator(self.mother_names)
         self.mother_names = [preprocess_string(item, "!/-,1234567890") for item in self.mother_names]
 
     def preprocess_tanggal(self):
