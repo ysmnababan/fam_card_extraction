@@ -91,9 +91,14 @@ def translate(text):
     
     return text  # If no match, return original
 
-def translate_date_to_japanese(date_str):
-    # Parse the date assuming it's in DD-MM-YYYY format
-    date_obj = datetime.strptime(date_str, "%d-%m-%Y")
+def translate_date_to_japanese(date_str, default_value=""):
+    formats = ["%d-%m-%Y", "%d.%m.%Y", "%-d-%-m-%Y", "%-d.%-m.%Y"]  # Optional: handle single-digit d/m with `-`
     
-    # Format it as 'YYYY年 M月 D日' with tabs between
-    return f"{date_obj.year}年 {date_obj.month}月 {date_obj.day}日"
+    for fmt in formats:
+        try:
+            date_obj = datetime.strptime(date_str, fmt)
+            return f"{date_obj.year}年 {date_obj.month}月 {date_obj.day}日"
+        except ValueError:
+            continue
+    
+    return default_value  # Return default if all formats fail
