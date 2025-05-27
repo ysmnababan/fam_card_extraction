@@ -19,7 +19,7 @@ SLICED_UPPER_TABLE = '/sliced_upper_table'
 SLICED_LOWER_TABLE = '/sliced_lower_table'
 UNPROCESSED_KK_JSON = 'kk_data.json'
 HEADER_SOURCE_IMG = "/horizontal_part_1.png"
-FOOTER_SOURCE_IMG = "/horizontal_part_4.png"
+FOOTER_SOURCE_IMG = "/horizontal_part_3.png"
 BEFORE_2018V = "BEFORE_2018"
 AFTER_2018V = "AFTER_2018"
 
