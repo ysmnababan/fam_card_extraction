@@ -236,11 +236,15 @@ class TableLinesRemover:
             column_crop = aligned_img[:, x_start:x_end]
             column_crop, angle = self.deskew_projection_method(column_crop)
             print(f"Image deskewed by {angle:.2f} degrees")
+            w = 50  # for example
+            # Ensure the image has enough height
+            if column_crop.shape[0] > w:
+                column_crop[:w, :] = 0  # Set the top 'w' rows to black
+            else:
+                print(f"Warning: Image height is less than {w}px, skipping black line.")
             cv2.imwrite(f"{output_dir}/before_column_{i+1}.png", column_crop)
+            
             column_crop = self.crop_bottom_of_table(column_crop)
-            cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
-            image = cv2.imread(f"{output_dir}/column_{i+1}.png")
-            column_crop = self.crop_above_table_header(image)
             cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
 
         print(f"Cropped {len(grouped_lines) - 1} columns.")
