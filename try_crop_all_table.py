@@ -59,7 +59,7 @@ def crop_upper_and_lower_space(img):
     row_sums = np.sum(processed == 255, axis=1)
     
     # Find horizontal lines by thresholding how many white pixels per row
-    line_rows = np.where(row_sums > processed.shape[1] * 0.25)[0]
+    line_rows = np.where(row_sums > processed.shape[1] * 0.5)[0]
 
     debug_img = visualize_line_rows(img, line_rows, scale=0.20)
     cv2.imshow("Line Rows", debug_img)
@@ -116,8 +116,15 @@ transformed_points = [
     (117.0, 3468.0),
 ]
 transformed_points = np.array(transformed_points)
-crop_transformed_image(transformed_points, img)
-img = cv2.imread("./output2/horizontal_part_2.png")
+# crop_transformed_image(transformed_points, img)
+img = cv2.imread("./output/sliced_lower_table/column_2.png")
+w = 50  # for example
+# Ensure the image has enough height
+if img.shape[0] > w:
+    img[:w, :] = 0  # Set the top 'w' rows to black
+else:
+    print(f"Warning: Image height is less than {w}px, skipping black line.")
+# cv2.imwrite(f"{output_dir}/before_column_{i+1}.png", column_crop)
 cropped = crop_upper_and_lower_space(img)
-cv2.imwrite("above_crop.png", cropped)
-crop_in_middle(cropped)
+cv2.imwrite("./output2/above_crop.png", cropped)
+# crop_in_middle(cropped)
