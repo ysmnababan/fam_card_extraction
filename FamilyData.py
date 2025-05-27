@@ -1,6 +1,6 @@
 import re
 import json
-from translator import translate, translate_date_to_japanese
+from translator import translate, translate_date_to_japanese, translate_citizenship
 
 def filter_after_separator(input_list):
     # Pattern: matches strings like "(4)", "( 4 )", etc.
@@ -12,6 +12,11 @@ def filter_after_separator(input_list):
     
     # If no separator found, return original list
     return input_list
+
+def extract_date(s: str) -> str:
+    # Match formats like d-m-yyyy, dd-mm-yyyy, d.m.yyyy, dd.mm.yyyy
+    match = re.search(r'\b\d{1,2}[-.]\d{1,2}[-.]\d{4}\b', s)
+    return match.group(0) if match else ''
 
 def preprocess_string(s, unwanted_chars="/-.,"):
     # 1. Remove unwanted characters dynamically using a character class
@@ -26,7 +31,8 @@ def keep_only_numbers(s: str) -> str:
     return re.sub(r'\D', '', s)  # \D = any non-digit character
 
 def keep_only_numbers_and_slash(s: str) -> str:
-    return re.sub(r'[^0-9/]', '', s)  # keep only digits and /
+    return re.sub(r'[^0-9/-]', '', s)  # keep only digits and /
+
 def keep_only_numbers_and_dash(s: str) -> str:
     return re.sub(r'[^0-9-]', '', s)  # keep only digits and -
 class FamilyData:
@@ -101,7 +107,7 @@ class FamilyData:
 
     def preprocess_birthdates(self):
         self.birthdates = filter_after_separator(self.birthdates) 
-        self.birthdates = [keep_only_numbers_and_dash(birthdate) for birthdate in self.birthdates]
+        self.birthdates = [extract_date(birthdate) for birthdate in self.birthdates]
 
     def preprocess_religions(self):
         self.religions = filter_after_separator(self.religions)
@@ -109,7 +115,7 @@ class FamilyData:
         self.religions = [translate(item) for item in self.religions]
 
     def preprocess_educations(self):
-        self.educations = filter_after_separator(self.religions)
+        self.educations = filter_after_separator(self.educations)
         self.educations = [preprocess_string(education, "!-,1234567890") for education in self.educations]
         self.educations = [translate(item) for item in self.educations]
 
@@ -125,7 +131,7 @@ class FamilyData:
 
     def preprocess_marriage_dates(self):
         self.marriage_dates = filter_after_separator(self.marriage_dates)
-        self.marriage_dates = [keep_only_numbers_and_dash(item) for item in self.marriage_dates]
+        self.marriage_dates = [extract_date(item) for item in self.marriage_dates]
         self.marriage_dates = [translate_date_to_japanese(item) for item in self.marriage_dates]
         
     def preprocess_marriage_rels(self):
@@ -136,7 +142,7 @@ class FamilyData:
     def preprocess_citizenships(self):
         self.citizenships = filter_after_separator(self.citizenships)
         self.citizenships = [preprocess_string(item, "!/-,1234567890") for item in self.citizenships]
-        self.citizenships = [translate(item) for item in self.citizenships]
+        self.citizenships = [translate_citizenship(item) for item in self.citizenships]
 
     def preprocess_paspor_no(self):
         self.paspor_no = filter_after_separator(self.paspor_no)
@@ -155,7 +161,7 @@ class FamilyData:
         self.mother_names = [preprocess_string(item, "!/-,1234567890") for item in self.mother_names]
 
     def preprocess_tanggal(self):
-        self.tanggal = keep_only_numbers_and_dash(self.tanggal)
+        self.tanggal = extract_date(self.tanggal)
 
     def preprocess_nip(self):
         self.nip = keep_only_numbers(self.nip)
