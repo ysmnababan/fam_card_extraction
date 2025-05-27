@@ -22,12 +22,12 @@ class TableScanner:
         thresholded_image = cv2.threshold(grey, 127, 255, cv2.THRESH_BINARY)[1]
         inverted_image = cv2.bitwise_not(thresholded_image)
 
-        hor = np.array([[1, 1, 1,]])
-        eroded = cv2.erode(inverted_image, hor, iterations=2)
+        hor = np.array([[1, 1, 1, 1, 1]])
+        eroded = cv2.erode(inverted_image, hor, iterations=7)
         dilated = cv2.dilate(eroded, hor, iterations=3)
 
         row_sums = np.sum(dilated == 255, axis=1)
-        line_rows = np.where(row_sums > dilated.shape[1] * 0.9)[0]
+        line_rows = np.where(row_sums > dilated.shape[1] * 0.7)[0]
 
         # print("Raw line rows:", line_rows)
         # Group nearby line rows (e.g., within 10px)
@@ -59,12 +59,51 @@ class TableScanner:
             print(f"Only found {len(line_positions)} lines, can't crop at line {n}")
             return img
 
+    def deskew_projection_method(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (9, 9), 0)
+        _, binary = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+        # Edge detection
+        edges = cv2.Canny(binary, 50, 150, apertureSize=3)
+
+        # Detect lines
+        lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=200)
+
+        if lines is None:
+            print("No lines detected for skew correction.")
+            return image, 0
+
+        angles = []
+
+        for line in lines:
+            rho, theta = line[0]
+            angle = (theta * 180 / np.pi) - 90
+            if -45 < angle < 45:  # focus on near-horizontal lines
+                angles.append(angle)
+
+        if len(angles) == 0:
+            return image, 0
+
+        avg_angle = np.mean(angles)
+        print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
+
+        # Rotate image
+        (h, w) = image.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, avg_angle, 1.0)
+        rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+        return rotated, avg_angle
+    
     def detect_single_image(self, image_path, n=3):
         directory = os.path.dirname(image_path)   # './output/sliced_lower_table'
         filename = os.path.basename(image_path)   # 'column_2.png'
 
         image = cv2.imread(image_path)
-        cropped_image = self.crop_above_nth_horizontal_line_with_grouping(img=image,n=n)
+        deskewed, angle = self.deskew_projection_method(image)
+        print(f"Image deskewed by {angle:.2f} degrees")
+        cropped_image = self.crop_above_nth_horizontal_line_with_grouping(img=deskewed,n=n)
         cropped_image_path = directory + "/header_cropped_" + filename
         cv2.imwrite(cropped_image_path, cropped_image)
         
