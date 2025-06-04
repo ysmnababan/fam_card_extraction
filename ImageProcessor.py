@@ -186,6 +186,14 @@ class ImageProcessor:
         processed = cv2.erode(inverted_image, hor, iterations=1)
         processed = cv2.dilate(processed, hor, iterations=3)
 
+        # Display the processed image scaled to 0.2 and close on 'q'
+        # display_img = cv2.resize(processed, (0, 0), fx=0.2, fy=0.2)
+        # cv2.imshow("Processed (scaled 0.2x)", display_img)
+        # while True:
+        #     if cv2.waitKey(1) & 0xFF == ord('q'):
+        #         break
+        # cv2.destroyAllWindows()
+
         row_sums = np.sum(processed == 255, axis=1)
         
         # Find horizontal lines by thresholding how many white pixels per row
