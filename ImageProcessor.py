@@ -35,8 +35,6 @@ class ImageProcessor:
         if os.path.exists(OUTPUT_PATH) and delete_output == "true":
             shutil.rmtree(OUTPUT_PATH)
             print(f"Deleted folder: {OUTPUT_PATH}")
-        else:
-            print(f"Folder does not exist: {OUTPUT_PATH}")
         # Recreate it
         if not os.path.exists(OUTPUT_PATH):
             os.makedirs(OUTPUT_PATH)
