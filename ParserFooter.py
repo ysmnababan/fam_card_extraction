@@ -235,6 +235,19 @@ def extract_date_from_lines(lines):
                 return f'{int(day):02d}-{int(month):02d}-{year}'
     return None
 
+def extract_18_digit_number(text):
+    """
+    Extracts the first 18-digit number from the input text.
+
+    Args:
+        text (str): The input text to search in.
+
+    Returns:
+        str or None: The 18-digit number if found, else None.
+    """
+    match = re.search(r'(?<!\d)(\d{18})(?!\d)', text)
+    return match.group(1) if match else ""
+
 def execute(image_path, output_path):
     words = get_words_with_positions(image_path)
     lines = group_words_into_lines(words)
@@ -243,6 +256,11 @@ def execute(image_path, output_path):
     columns = split_lines_into_columns(lines)
     date = extract_date_from_lines(columns['left'])
     officer_name = find_line_above(columns['right'], "NIP")
+    if 'nip' not in extracted_val:
+        nip = extract_18_digit_number(r_text)
+        if nip != "":
+            officer_name = find_line_above(columns['right'], nip, x_proximity_tolerance=700)
+            extracted_val['nip'] = nip
     if officer_name:
         extracted_val["officer_name"] = clean_officer_name(officer_name)
     if date:
