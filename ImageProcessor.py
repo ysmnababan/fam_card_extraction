@@ -63,8 +63,7 @@ class ImageProcessor:
             filetypes=[("Image and PDF files", "*.jpg *.jpeg *.png *.bmp *.pdf")]
         )
         if not self.target_path:
-            print("No file selected.")
-            sys.exit(1)
+            raise FileNotFoundError
         else:
             print(f"Selected file: {self.target_path}")
 
@@ -104,15 +103,15 @@ class ImageProcessor:
                 target = cv2.imread(img_path)
                 if target is None:
                     error("Failed to load the image.")
-                    sys.exit(1)
+                    raise FileNotFoundError
                 else:
                     info("Image loaded successfully.")
             else:
-                error("No image to load.")
-                sys.exit(1)
+                info("No image to load.")
+                raise FileNotFoundError
         else:
             info("Run cancelled: no file selected.")
-            sys.exit(1)
+            raise FileNotFoundError
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
         h_img, w_img = target.shape[:2]
@@ -130,7 +129,7 @@ class ImageProcessor:
 
         if len(clicked_points) != 4:
             info("You must select exactly 4 points.")
-            sys.exit(1)
+            raise ValueError
 
         clicked_points = clicker.order_points_clockwise(clicked_points)
 
@@ -154,23 +153,27 @@ class ImageProcessor:
         print("Transformed points (in aligned image):")
         for pt in transformed_points:
             print(f"({pt[0]:.2f}, {pt[1]:.2f})")
+        info("CROP FILE INTO 4 DIFFERENT PIECES")
         self.crop_transformed_image(transformed_points, aligned_target)
+        info("CROP COLUMN")
         self.chop_table_by_column()
-        if (self.upper_column_num == 11 and self.lower_column_num == 10):
+        if (self.upper_column_num == 10 and self.lower_column_num == 9):
             self.version = AFTER_2018V
-        elif (self.upper_column_num == 10 and self.lower_column_num == 9):
+        elif (self.upper_column_num == 9 and self.lower_column_num == 8):
             self.version = BEFORE_2018V
         else :
             error("failed to crop table")
-            sys.exit(1)
-        info("DOCUMENT VERSION: ", self.version)    
+            raise 
+        info("DOCUMENT VERSION: "+ self.version)    
         
 
     def chop_table_by_column(self):
+        info("Chop Upper table")
         lines_remover = tlr.TableLinesRemover(self.upper_table)
         lines_remover.execute(OUTPUT_PATH + SLICED_UPPER_TABLE)
         self.upper_column_num = lines_remover.get_column()
         
+        info("Chop Lower table")
         lines_remover = tlr.TableLinesRemover(self.lower_table)
         lines_remover.execute(OUTPUT_PATH+SLICED_LOWER_TABLE)
         self.lower_column_num = lines_remover.get_column()

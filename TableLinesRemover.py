@@ -220,31 +220,43 @@ class TableLinesRemover:
         visual_img = self.visualize_vertical_lines(self.image, grouped_lines)
         success = cv2.imwrite(f"{output_dir}/grouped_columns_preview.png", visual_img)
         debug("Image saved successfully:")
-        self.column = len(grouped_lines)
+        min_percentage = 0.03
+
         info(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
         if len(grouped_lines) > 1:
             grouped_lines = grouped_lines[1:]
-        # Load the aligned original image
+
         aligned_img = self.image
+        total_width = aligned_img.shape[1]
 
-        # Crop between each pair of dividers
+        skipped_columns = 0
+        valid_columns = []
 
+        # First, filter out too narrow columns
         for i in range(len(grouped_lines) - 1):
             x_start = grouped_lines[i]
             x_end = grouped_lines[i + 1]
+            col_width = x_end - x_start
+            if col_width / total_width < min_percentage:
+                skipped_columns += 1
+                debug(f"Skipping column {i+1}: width {col_width} is less than {min_percentage*100:.1f}% of total width")
+            else:
+                valid_columns.append((x_start, x_end))
+
+        # Crop and save only valid columns
+        for idx, (x_start, x_end) in enumerate(valid_columns, start=1):
             column_crop = aligned_img[:, x_start:x_end]
             column_crop, angle = self.deskew_projection_method(column_crop)
-            # print(f"Image deskewed by {angle:.2f} degrees")
-            w = 50  # for example
-            # Ensure the image has enough height
-            if column_crop.shape[0] > w:
-                column_crop[:w, :] = 0  # Set the top 'w' rows to black
-            else:
-                print(f"Warning: Image height is less than {w}px, skipping black line.")
-            cv2.imwrite(f"{output_dir}/before_column_{i+1}.png", column_crop)
             
+            w = 50  # top rows to black
+            if column_crop.shape[0] > w:
+                column_crop[:w, :] = 0
+            else:
+                info(f"Warning: Image height is less than {w}px, skipping black line.")
+            
+            cv2.imwrite(f"{output_dir}/before_column_{idx}.png", column_crop)
             column_crop = self.crop_bottom_of_table(column_crop)
-            cv2.imwrite(f"{output_dir}/column_{i+1}.png", column_crop)
-
-        print(f"Cropped {len(grouped_lines) - 1} columns.")
+            cv2.imwrite(f"{output_dir}/column_{idx}.png", column_crop)
+        self.column = len(valid_columns)
+        info(f"Cropped {len(valid_columns)} columns, skipped {skipped_columns} too narrow columns.")
