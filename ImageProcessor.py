@@ -31,9 +31,9 @@ class ImageProcessor:
         self.template_path = resource_path(template_path)
         self.output_aligned_path = resource_path(output_aligned_path)
         self.crop_output_dir = crop_output_dir
-        self.version = "after_2018"
-        self.upper_column_version = "after_2017"
-        self.lower_column_version = "after_2018"
+        self.version = BEFORE_2018V
+        self.upper_column_version =BEFORE_2018V 
+        self.lower_column_version =BEFORE_2018V 
         self.open_window = open_window
         self.converted_image_path = None  # path to converted PNG if PDF
         if os.path.exists(OUTPUT_PATH) and delete_output == "true":
@@ -64,7 +64,7 @@ class ImageProcessor:
 
     def extract_table(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
-        main_table = kk.KKStructure(self.version)
+        main_table = kk.KKStructure(self.upper_column_version, self.lower_column_version)
         main_table.execute(filename=json_output_path, template_filename=JSON_TEMPLATE)
 
     def select_file(self):
@@ -169,15 +169,11 @@ class ImageProcessor:
         self.crop_transformed_image(transformed_points, aligned_target)
         info("CROP COLUMN")
         self.chop_table_by_column()
-        if (self.upper_column_num == 10 and self.lower_column_num == 9):
-            self.version = AFTER_2018V
-        elif (self.upper_column_num == 9 and self.lower_column_num == 8):
-            self.version = BEFORE_2018V
-        else :
-            error("failed to crop table")
-            # raise 
-        info("DOCUMENT VERSION: "+ self.version)    
-        
+        if (self.upper_column_num == 10):
+            self.upper_column_version = AFTER_2018V
+
+        if (self.lower_column_num == 9):
+            self.lower_column_version = AFTER_2018V
 
     def chop_table_by_column(self):
         info("Chop Upper table")
@@ -199,14 +195,6 @@ class ImageProcessor:
         hor = np.array([[1, 1, 1]])
         processed = cv2.erode(inverted_image, hor, iterations=1)
         processed = cv2.dilate(processed, hor, iterations=3)
-
-        # Display the processed image scaled to 0.2 and close on 'q'
-        # display_img = cv2.resize(processed, (0, 0), fx=0.2, fy=0.2)
-        # cv2.imshow("Processed (scaled 0.2x)", display_img)
-        # while True:
-        #     if cv2.waitKey(1) & 0xFF == ord('q'):
-        #         break
-        # cv2.destroyAllWindows()
 
         row_sums = np.sum(processed == 255, axis=1)
         

@@ -193,6 +193,8 @@ class TableScanner:
         return merged_lines
     
     def detect_single_image(self, image_path, n=3):
+        if not os.path.isfile(image_path):
+            return []
         directory = os.path.dirname(image_path)   # './output/sliced_lower_table'
         filename = os.path.basename(image_path)   # 'column_2.png'
 
