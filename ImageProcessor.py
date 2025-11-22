@@ -13,6 +13,7 @@ import shutil
 import sys
 from helper import resource_path
 from logger import info, error
+import json 
 
 JSON_TEMPLATE = resource_path("./templ/template.json")
 OUTPUT_PATH = './output'
@@ -31,6 +32,8 @@ class ImageProcessor:
         self.output_aligned_path = resource_path(output_aligned_path)
         self.crop_output_dir = crop_output_dir
         self.version = "after_2018"
+        self.upper_column_version = "after_2017"
+        self.lower_column_version = "after_2018"
         self.open_window = open_window
         self.converted_image_path = None  # path to converted PNG if PDF
         if os.path.exists(OUTPUT_PATH) and delete_output == "true":
@@ -39,7 +42,16 @@ class ImageProcessor:
         # Recreate it
         if not os.path.exists(OUTPUT_PATH):
             os.makedirs(OUTPUT_PATH)
+        self.save_to_json()
+        
+    def save_to_json(self,):
+        json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
+        with open(JSON_TEMPLATE, 'r', encoding='utf-8') as f:
+            existing_data = json.load(f)
 
+        with open(json_output_path, 'w', encoding='utf-8') as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=4)
+            
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
         image_path = OUTPUT_PATH + HEADER_SOURCE_IMG
@@ -163,7 +175,7 @@ class ImageProcessor:
             self.version = BEFORE_2018V
         else :
             error("failed to crop table")
-            raise 
+            # raise 
         info("DOCUMENT VERSION: "+ self.version)    
         
 

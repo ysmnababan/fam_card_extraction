@@ -22,7 +22,7 @@ PROCESSED_JSON_PATH = "./output/processed_data.json"
 # FINAL_PATH = "final.xlsx"
 
 FINAL_PATH = ""
-OPEN_EXPLORER = "false"
+OPEN_EXPLORER = "true"
 DELETE_OUTPUT_FOLDER = "true"
 
 # return path to credential file we should use (string)
@@ -75,31 +75,33 @@ if __name__ == '__main__':
         OPEN_EXPLORER,
         DELETE_OUTPUT_FOLDER
     )
+    createExcel=True
     try:
         log("CROP TABLE INTO PIECES \n")
-        processor.run()
-        
-        log("EXTRACTING TEXT FROM TABLE \n")
-        processor.extract_table()
-        
+        processor.run()        
+
         log("EXTRACTING TEXT FROM HEADER \n")
         processor.extract_header()
 
         log("EXTRACTING TEXT FROM FOOTER \n")
         processor.extract_footer()
 
-        log("CLEANING THE OCR DATA \n")
-        family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
-        family.preprocess(PROCESSED_JSON_PATH)
-
-        log("INSERT TO EXCEL \n")
-        etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+        log("EXTRACTING TEXT FROM TABLE \n")
+        processor.extract_table()
     except FileNotFoundError:
         debug("FileNotFoundError Exception")
+        createExcel= False
     except ValueError:
         debug("Value Error Exception")
+        createExcel= False
     except Exception as e :
         info("exception thrown")
-        log("INSERT TO DEFAULT EXCEL \n")
-        etf.populate_excel(input_json_path=JSON_TEMPLATE, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+    finally:
+        if createExcel:            
+            log("CLEANING THE OCR DATA\n")
+            family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
+            family.preprocess(PROCESSED_JSON_PATH)
+            
+            log("INSERT TO EXCEL \n")
+            etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
     print("END OF PROGRAM ... \n")

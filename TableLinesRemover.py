@@ -224,9 +224,6 @@ class TableLinesRemover:
 
         info(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
-        if len(grouped_lines) > 1:
-            grouped_lines = grouped_lines[1:]
-
         aligned_img = self.image
         total_width = aligned_img.shape[1]
 
