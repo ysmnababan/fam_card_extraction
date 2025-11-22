@@ -194,7 +194,7 @@ class TableLinesRemover:
             return image, 0
 
         avg_angle = np.mean(angles)
-        print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
+        # print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
 
         # Rotate image
         (h, w) = image.shape[:2]
@@ -213,7 +213,7 @@ class TableLinesRemover:
 
         # Get the x-coordinates of white vertical lines
         line_positions = np.where(cols_sum > threshold)[0]
-        print("LINE POSITIONS",line_positions)
+        # print("LINE POSITIONS",line_positions)
         grouped_lines = self.group_close_positions(line_positions, min_dist=65)
 
         # Visualize the result
@@ -235,7 +235,7 @@ class TableLinesRemover:
             x_end = grouped_lines[i + 1]
             column_crop = aligned_img[:, x_start:x_end]
             column_crop, angle = self.deskew_projection_method(column_crop)
-            print(f"Image deskewed by {angle:.2f} degrees")
+            # print(f"Image deskewed by {angle:.2f} degrees")
             w = 50  # for example
             # Ensure the image has enough height
             if column_crop.shape[0] > w:

@@ -87,7 +87,7 @@ class TableScanner:
             return image, 0
 
         avg_angle = np.mean(angles)
-        print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
+        # print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
 
         # Rotate image
         (h, w) = image.shape[:2]
@@ -198,7 +198,7 @@ class TableScanner:
         # preprocess
         image = cv2.imread(image_path)
         deskewed, angle = self.deskew_projection_method(image)
-        print(f"Image deskewed by {angle:.2f} degrees")
+        # print(f"Image deskewed by {angle:.2f} degrees")
         cropped_image = self.crop_above_nth_horizontal_line_with_grouping(img=deskewed,n=n)
         cropped_image_path = directory + "/header_cropped_" + filename
         cv2.imwrite(cropped_image_path, cropped_image)

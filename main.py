@@ -5,8 +5,9 @@ import os
 import sys
 import platform
 from pathlib import Path
+from logger import log, start_pipeline
 # === Config ===
-TARGET_IMAGE_PATH = './img/kk1.jpeg'
+TARGET_IMAGE_PATH = './img/kk ebiet_page1.png'
 TEMPLATE_IMAGE_PATH = './templ/kk_template.png'
 OUTPUT_ALIGNED_PATH = './output/aligned_target.png'
 CROP_OUTPUT_DIR = 'cropped_cells'
@@ -15,7 +16,7 @@ PROCESSED_JSON_PATH = "./output/processed_data.json"
 WORKBOOK_PATH = "./templ/template.xlsx"
 # FINAL_PATH = "final.xlsx"
 FINAL_PATH = ""
-OPEN_EXPLORER = "true"
+OPEN_EXPLORER = "false"
 DELETE_OUTPUT_FOLDER = "true"
 
 # return path to credential file we should use (string)
@@ -47,6 +48,8 @@ def get_credentials_path(filename="secret.json"):
     return str(p) if p.exists() else None
 
 if __name__ == '__main__':
+    start_pipeline(7)
+    log("GET SECRET JSON CONFIG \n")
     cred = get_credentials_path()
     if cred:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = cred
@@ -65,12 +68,20 @@ if __name__ == '__main__':
         OPEN_EXPLORER,
         DELETE_OUTPUT_FOLDER
     )
-    processor.run()
-    processor.extract_table()
-    processor.extract_header()
-    processor.extract_footer()
+    
+    log("CROP TABLE INTO PIECES \n")
+    # processor.run()
+    log("EXTRACTING TEXT FROM TABLE \n")
+    # processor.extract_table()
+    log("EXTRACTING TEXT FROM HEADER \n")
+    # processor.extract_header()
+    log("EXTRACTING TEXT FROM FOOTER \n")
+    # processor.extract_footer()
 
-    family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
-    family.preprocess(PROCESSED_JSON_PATH)
+    # family = fd.FamilyData.from_json_file(JSON_OUTPUT_PATH)
+    log("CLEANING THE OCR DATA \n")
+    # family.preprocess(PROCESSED_JSON_PATH)
 
-    etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+    log("INSERT TO EXCEL \n")
+    # etf.populate_excel(input_json_path=PROCESSED_JSON_PATH, workbook_path=WORKBOOK_PATH, final_output_path=FINAL_PATH)
+    print("END OF PROGRAM ... \n")
