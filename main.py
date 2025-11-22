@@ -5,7 +5,7 @@ import os
 import sys
 import platform
 from pathlib import Path
-from logger import log, start_pipeline
+from logger import log, start_pipeline, enable_debug
 # === Config ===
 TARGET_IMAGE_PATH = './img/kk ebiet_page1.png'
 TEMPLATE_IMAGE_PATH = './templ/kk_template.png'
@@ -49,6 +49,7 @@ def get_credentials_path(filename="secret.json"):
 
 if __name__ == '__main__':
     start_pipeline(7)
+    enable_debug(False)
     log("GET SECRET JSON CONFIG \n")
     cred = get_credentials_path()
     if cred:
@@ -70,11 +71,14 @@ if __name__ == '__main__':
     )
     
     log("CROP TABLE INTO PIECES \n")
-    # processor.run()
+    processor.run()
+    
     log("EXTRACTING TEXT FROM TABLE \n")
     # processor.extract_table()
+    
     log("EXTRACTING TEXT FROM HEADER \n")
     # processor.extract_header()
+
     log("EXTRACTING TEXT FROM FOOTER \n")
     # processor.extract_footer()
 

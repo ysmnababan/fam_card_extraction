@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 from collections import defaultdict
+from logger import debug, info, error
 
 class TableScanner:
     def filter_number_lines(self, lines):
@@ -54,10 +55,10 @@ class TableScanner:
             nth_line_y = line_positions[n - 1]
             crop_y = min(img.shape[0], nth_line_y + 2)  # margin below line
             cropped = img[crop_y:, :]
-            print(f"Cropped above line {n} at Y={crop_y}")
+            debug(f"Cropped above line {n} at Y={crop_y}")
             return cropped
         else:
-            print(f"Only found {len(line_positions)} lines, can't crop at line {n}")
+            info(f"Only found {len(line_positions)} lines, can't crop at line {n}")
             return img
 
     def deskew_projection_method(self, image):
@@ -72,7 +73,7 @@ class TableScanner:
         lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=200)
 
         if lines is None:
-            print("No lines detected for skew correction.")
+            debug("No lines detected for skew correction.")
             return image, 0
 
         angles = []

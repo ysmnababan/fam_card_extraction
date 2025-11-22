@@ -12,6 +12,7 @@ import os
 import shutil
 import sys
 from helper import resource_path
+from logger import info, error
 
 JSON_TEMPLATE = resource_path("./templ/template.json")
 OUTPUT_PATH = './output'
@@ -102,15 +103,15 @@ class ImageProcessor:
             if img_path:
                 target = cv2.imread(img_path)
                 if target is None:
-                    print("Failed to load the image.")
+                    error("Failed to load the image.")
                     sys.exit(1)
                 else:
-                    print("Image loaded successfully.")
+                    info("Image loaded successfully.")
             else:
-                print("No image to load.")
+                error("No image to load.")
                 sys.exit(1)
         else:
-            print("Run cancelled: no file selected.")
+            info("Run cancelled: no file selected.")
             sys.exit(1)
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
@@ -128,7 +129,7 @@ class ImageProcessor:
         clicked_points = clicker.show()
 
         if len(clicked_points) != 4:
-            print("You must select exactly 4 points.")
+            info("You must select exactly 4 points.")
             sys.exit(1)
 
         clicked_points = clicker.order_points_clockwise(clicked_points)
@@ -160,9 +161,9 @@ class ImageProcessor:
         elif (self.upper_column_num == 10 and self.lower_column_num == 9):
             self.version = BEFORE_2018V
         else :
-            print("failed to crop table")
+            error("failed to crop table")
             sys.exit(1)
-        print(self.version)    
+        info("DOCUMENT VERSION: ", self.version)    
         
 
     def chop_table_by_column(self):

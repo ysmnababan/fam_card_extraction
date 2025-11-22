@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import os
-
+from logger import debug, info, error
 class TableLinesRemover:
 
     def __init__(self, image):
@@ -131,10 +131,10 @@ class TableLinesRemover:
             # Crop the original image above the bottom line
             cropped = img[:crop_y, :]
             # cv2.imwrite("cropped_above_bottom_line.png", cropped)
-            print(f"Cropped above bottom line at Y={crop_y}")
+            debug(f"Cropped above bottom line at Y={crop_y}")
             return cropped
         else:
-            print("No horizontal lines found.")
+            info("No horizontal lines found.")
             return img
 
     def crop_above_table_header(self, img):
@@ -219,9 +219,9 @@ class TableLinesRemover:
         # Visualize the result
         visual_img = self.visualize_vertical_lines(self.image, grouped_lines)
         success = cv2.imwrite(f"{output_dir}/grouped_columns_preview.png", visual_img)
-        print("Image saved successfully:", success)
+        debug("Image saved successfully:")
         self.column = len(grouped_lines)
-        print(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
+        info(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
         if len(grouped_lines) > 1:
             grouped_lines = grouped_lines[1:]
