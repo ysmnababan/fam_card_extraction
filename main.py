@@ -95,7 +95,7 @@ if __name__ == '__main__':
         debug("Value Error Exception")
         createExcel= False
     except Exception as e :
-        info("exception thrown")
+        info(f"exception thrown: {e}")
     finally:
         if createExcel:            
             log("CLEANING THE OCR DATA\n")

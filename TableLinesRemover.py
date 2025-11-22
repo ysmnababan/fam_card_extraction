@@ -222,22 +222,45 @@ class TableLinesRemover:
         debug("Image saved successfully:")
         min_percentage = 0.03
 
-        info(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
         aligned_img = self.image
         total_width = aligned_img.shape[1]
+        
+        # Append the right edge as the last divider
+        if grouped_lines[-1] != total_width:
+            grouped_lines = grouped_lines + [total_width]
+
+        if grouped_lines[0] != 0:
+            grouped_lines = [0]+ grouped_lines
+
+        info(f"Detected {len(grouped_lines)} column dividers: {grouped_lines}")
 
         skipped_columns = 0
         valid_columns = []
 
-        # First, filter out too narrow columns
+        # iterate every adjacent pair, including last divider -> image end
         for i in range(len(grouped_lines) - 1):
             x_start = grouped_lines[i]
             x_end = grouped_lines[i + 1]
+
+            # clamp to image bounds just to be safe
+            x_start = max(0, min(x_start, total_width))
+            x_end = max(0, min(x_end, total_width))
+
             col_width = x_end - x_start
-            if col_width / total_width < min_percentage:
+
+            # treat zero-or-negative width as skip
+            if col_width <= 0:
                 skipped_columns += 1
-                debug(f"Skipping column {i+1}: width {col_width} is less than {min_percentage*100:.1f}% of total width")
+                debug(f"Skipping column {i+1}: invalid width {col_width}px (start={x_start}, end={x_end})")
+                continue
+
+            if (col_width / total_width) < min_percentage:
+                skipped_columns += 1
+                debug(
+                    f"Skipping column {i+1}: width {col_width}px "
+                    f"is less than {min_percentage*100:.2f}% of total width ({total_width}px)"
+                )
             else:
                 valid_columns.append((x_start, x_end))
 
