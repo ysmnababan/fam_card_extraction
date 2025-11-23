@@ -111,7 +111,7 @@ class KKStructure:
         print("scanning marriage stats completed\n\n")
     
     def add_marriage_dates(self,):
-        if self.version == ip.BEFORE_2018V:
+        if self.version == ip.AFTER_2018V:
             self.marriage_dates = []
             return
         table_scanner = ts.TableScanner()
@@ -121,7 +121,7 @@ class KKStructure:
     
     def add_marriage_rels(self,):
         table_scanner = ts.TableScanner()
-        if self.version == ip.BEFORE_2018V:
+        if self.version == ip.AFTER_2018V:
             self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME_2018V)
         else :
             self.marriage_rels = table_scanner.detect_single_image(LOWER_TABLE_DIR+MARRIAGE_REL_COLUMN_IMAGE_FILE_NAME)
@@ -130,7 +130,7 @@ class KKStructure:
 
     def add_citizenship(self,):
         table_scanner = ts.TableScanner()
-        if self.lower_col_version == ip.BEFORE_2018V:
+        if self.lower_col_version == ip.AFTER_2018V:
             self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME_2018V)
         else :
             self.citizenships = table_scanner.detect_single_image(LOWER_TABLE_DIR+CITIZEN_COLUMN_IMAGE_FILE_NAME)
@@ -139,7 +139,7 @@ class KKStructure:
 
     def add_paspor_no(self,):
         table_scanner = ts.TableScanner()
-        if self.lower_col_version == ip.BEFORE_2018V:
+        if self.lower_col_version == ip.AFTER_2018V:
             self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else :
             self.paspor_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+PASPOR_NO_COLUMN_IMAGE_FILE_NAME,4)
@@ -148,7 +148,7 @@ class KKStructure:
 
     def add_kitas_no(self,):
         table_scanner = ts.TableScanner()
-        if self.lower_col_version == ip.BEFORE_2018V:
+        if self.lower_col_version == ip.AFTER_2018V:
             self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else:
             self.kitas_no = table_scanner.detect_single_image(LOWER_TABLE_DIR+KITAS_NO_COLUMN_IMAGE_FILE_NAME,4)
@@ -157,16 +157,16 @@ class KKStructure:
     
     def add_father_names(self,):
         table_scanner = ts.TableScanner()
-        if self.lower_col_version == ip.BEFORE_2018V:
+        if self.lower_col_version == ip.AFTER_2018V:
             self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else :
             self.father_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+FATHER_COLUMN_IMAGE_FILE_NAME,4)
-        print("FATHER NAMES: ",self.father_names)
+        print("FATHER NAMES: ",self.father_names, self.lower_col_version)
         print("scanning father names completed\n\n")
 
     def add_mother_names(self,):
         table_scanner = ts.TableScanner()
-        if self.lower_col_version == ip.BEFORE_2018V:
+        if self.lower_col_version == ip.AFTER_2018V:
             self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME_2018V,4)
         else : 
             self.mother_names = table_scanner.detect_single_image(LOWER_TABLE_DIR+MOTHER_COLUMN_IMAGE_FILE_NAME,4)
