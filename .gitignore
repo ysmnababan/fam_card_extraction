@@ -76,3 +76,6 @@ output/
 *:Zone.Identifier
 *final.xlsx
 output.zip
+
+secret.json
+res.xlsx

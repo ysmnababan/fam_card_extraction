@@ -12,6 +12,8 @@ import os
 import shutil
 import sys
 from helper import resource_path
+from logger import info, error
+import json 
 
 JSON_TEMPLATE = resource_path("./templ/template.json")
 OUTPUT_PATH = './output'
@@ -29,7 +31,9 @@ class ImageProcessor:
         self.template_path = resource_path(template_path)
         self.output_aligned_path = resource_path(output_aligned_path)
         self.crop_output_dir = crop_output_dir
-        self.version = "after_2018"
+        self.version = BEFORE_2018V
+        self.upper_column_version =BEFORE_2018V 
+        self.lower_column_version =BEFORE_2018V 
         self.open_window = open_window
         self.converted_image_path = None  # path to converted PNG if PDF
         if os.path.exists(OUTPUT_PATH) and delete_output == "true":
@@ -38,7 +42,16 @@ class ImageProcessor:
         # Recreate it
         if not os.path.exists(OUTPUT_PATH):
             os.makedirs(OUTPUT_PATH)
+        self.save_to_json()
+        
+    def save_to_json(self,):
+        json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
+        with open(JSON_TEMPLATE, 'r', encoding='utf-8') as f:
+            existing_data = json.load(f)
 
+        with open(json_output_path, 'w', encoding='utf-8') as f:
+            json.dump(existing_data, f, ensure_ascii=False, indent=4)
+            
     def extract_header(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
         image_path = OUTPUT_PATH + HEADER_SOURCE_IMG
@@ -51,7 +64,7 @@ class ImageProcessor:
 
     def extract_table(self):
         json_output_path = OUTPUT_PATH + "/" + UNPROCESSED_KK_JSON
-        main_table = kk.KKStructure(self.version)
+        main_table = kk.KKStructure(self.upper_column_version, self.lower_column_version)
         main_table.execute(filename=json_output_path, template_filename=JSON_TEMPLATE)
 
     def select_file(self):
@@ -62,8 +75,7 @@ class ImageProcessor:
             filetypes=[("Image and PDF files", "*.jpg *.jpeg *.png *.bmp *.pdf")]
         )
         if not self.target_path:
-            print("No file selected.")
-            sys.exit(1)
+            raise FileNotFoundError
         else:
             print(f"Selected file: {self.target_path}")
 
@@ -102,16 +114,16 @@ class ImageProcessor:
             if img_path:
                 target = cv2.imread(img_path)
                 if target is None:
-                    print("Failed to load the image.")
-                    sys.exit(1)
+                    error("Failed to load the image.")
+                    raise FileNotFoundError
                 else:
-                    print("Image loaded successfully.")
+                    info("Image loaded successfully.")
             else:
-                print("No image to load.")
-                sys.exit(1)
+                info("No image to load.")
+                raise FileNotFoundError
         else:
-            print("Run cancelled: no file selected.")
-            sys.exit(1)
+            info("Run cancelled: no file selected.")
+            raise FileNotFoundError
 
         target = cv2.resize(target, (template.shape[1], template.shape[0]))
         h_img, w_img = target.shape[:2]
@@ -128,8 +140,8 @@ class ImageProcessor:
         clicked_points = clicker.show()
 
         if len(clicked_points) != 4:
-            print("You must select exactly 4 points.")
-            sys.exit(1)
+            info("You must select exactly 4 points.")
+            raise ValueError
 
         clicked_points = clicker.order_points_clockwise(clicked_points)
 
@@ -153,23 +165,23 @@ class ImageProcessor:
         print("Transformed points (in aligned image):")
         for pt in transformed_points:
             print(f"({pt[0]:.2f}, {pt[1]:.2f})")
+        info("CROP FILE INTO 4 DIFFERENT PIECES")
         self.crop_transformed_image(transformed_points, aligned_target)
+        info("CROP COLUMN")
         self.chop_table_by_column()
-        if (self.upper_column_num == 11 and self.lower_column_num == 10):
-            self.version = AFTER_2018V
-        elif (self.upper_column_num == 10 and self.lower_column_num == 9):
-            self.version = BEFORE_2018V
-        else :
-            print("failed to crop table")
-            sys.exit(1)
-        print(self.version)    
-        
+        if (self.upper_column_num == 10):
+            self.upper_column_version = AFTER_2018V
+
+        if (self.lower_column_num == 9):
+            self.lower_column_version = AFTER_2018V
 
     def chop_table_by_column(self):
+        info("Chop Upper table")
         lines_remover = tlr.TableLinesRemover(self.upper_table)
         lines_remover.execute(OUTPUT_PATH + SLICED_UPPER_TABLE)
         self.upper_column_num = lines_remover.get_column()
         
+        info("Chop Lower table")
         lines_remover = tlr.TableLinesRemover(self.lower_table)
         lines_remover.execute(OUTPUT_PATH+SLICED_LOWER_TABLE)
         self.lower_column_num = lines_remover.get_column()
@@ -183,14 +195,6 @@ class ImageProcessor:
         hor = np.array([[1, 1, 1]])
         processed = cv2.erode(inverted_image, hor, iterations=1)
         processed = cv2.dilate(processed, hor, iterations=3)
-
-        # Display the processed image scaled to 0.2 and close on 'q'
-        # display_img = cv2.resize(processed, (0, 0), fx=0.2, fy=0.2)
-        # cv2.imshow("Processed (scaled 0.2x)", display_img)
-        # while True:
-        #     if cv2.waitKey(1) & 0xFF == ord('q'):
-        #         break
-        # cv2.destroyAllWindows()
 
         row_sums = np.sum(processed == 255, axis=1)
         

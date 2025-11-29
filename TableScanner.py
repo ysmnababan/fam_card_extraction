@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 from collections import defaultdict
+from logger import debug, info, error
 
 class TableScanner:
     def filter_number_lines(self, lines):
@@ -54,10 +55,10 @@ class TableScanner:
             nth_line_y = line_positions[n - 1]
             crop_y = min(img.shape[0], nth_line_y + 2)  # margin below line
             cropped = img[crop_y:, :]
-            print(f"Cropped above line {n} at Y={crop_y}")
+            debug(f"Cropped above line {n} at Y={crop_y}")
             return cropped
         else:
-            print(f"Only found {len(line_positions)} lines, can't crop at line {n}")
+            info(f"Only found {len(line_positions)} lines, can't crop at line {n}")
             return img
 
     def deskew_projection_method(self, image):
@@ -72,7 +73,7 @@ class TableScanner:
         lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=200)
 
         if lines is None:
-            print("No lines detected for skew correction.")
+            debug("No lines detected for skew correction.")
             return image, 0
 
         angles = []
@@ -87,7 +88,7 @@ class TableScanner:
             return image, 0
 
         avg_angle = np.mean(angles)
-        print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
+        # print(f"[INFO] Detected skew angle: {avg_angle:.2f} degrees")
 
         # Rotate image
         (h, w) = image.shape[:2]
@@ -192,13 +193,15 @@ class TableScanner:
         return merged_lines
     
     def detect_single_image(self, image_path, n=3):
+        if not os.path.isfile(image_path):
+            return []
         directory = os.path.dirname(image_path)   # './output/sliced_lower_table'
         filename = os.path.basename(image_path)   # 'column_2.png'
 
         # preprocess
         image = cv2.imread(image_path)
         deskewed, angle = self.deskew_projection_method(image)
-        print(f"Image deskewed by {angle:.2f} degrees")
+        # print(f"Image deskewed by {angle:.2f} degrees")
         cropped_image = self.crop_above_nth_horizontal_line_with_grouping(img=deskewed,n=n)
         cropped_image_path = directory + "/header_cropped_" + filename
         cv2.imwrite(cropped_image_path, cropped_image)
