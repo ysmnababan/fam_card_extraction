@@ -25,8 +25,9 @@ def preprocess_string(s, unwanted_chars="/-.,"):
     # 2. Replace multiple spaces with a single space
     s = re.sub(r'\s+', ' ', s)
     # 3. Strip leading and trailing spaces
-    return s.strip()
-
+    s = s.strip()
+    return "" if len(s) <= 1 else s
+    
 def keep_only_numbers(s: str) -> str:
     return re.sub(r'\D', '', s)  # \D = any non-digit character
 

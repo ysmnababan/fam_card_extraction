@@ -125,7 +125,10 @@ pyinstaller --noconfirm --onedir --console ^
 (Use the same structure for other Windows paths.)
 
 ---
+## 📷 Demo
+![Demo GIF](./demo/demo.gif)
 
+---
 ## 🤝 Contributing
 
 Contributions are welcome!
