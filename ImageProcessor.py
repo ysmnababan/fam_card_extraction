@@ -14,6 +14,7 @@ import sys
 from helper import resource_path
 from logger import info, error
 import json 
+import platform
 
 JSON_TEMPLATE = resource_path("./templ/template.json")
 OUTPUT_PATH = './output'
@@ -80,16 +81,21 @@ class ImageProcessor:
             print(f"Selected file: {self.target_path}")
 
     def convert_pdf_to_png(self, pdf_path):
-        # Get the path of the current script
-        current_dir = os.path.dirname(__file__)
-
-        # Point to the 'bin' directory inside the 'poppler' folder
-        poppler_path = os.path.join(current_dir, "poppler", "bin")
         print("Converting PDF to PNG...")
-        pages = convert_from_path(pdf_path, dpi=200, poppler_path=poppler_path)
-        if not pages:
-            print("PDF has no pages.")
+
+        poppler_path = None
+
+        # Windows: use bundled Poppler
+        if platform.system() == "Windows":
+            current_dir = os.path.dirname(__file__)
+            poppler_path = os.path.join(current_dir, "poppler", "bin")
+
+        try:
+            pages = convert_from_path(pdf_path, dpi=200, poppler_path=poppler_path)
+        except Exception as e:
+            print("[Error] PDF conversion failed:", e)
             return None
+
         output_png = os.path.splitext(pdf_path)[0] + "_page1.png"
         pages[0].save(output_png, "PNG")
         print(f"Saved first page as: {output_png}")
